@@ -264,6 +264,67 @@
             color: #333;
         }
 
+        /* 积分弹窗 */
+        .points-modal {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            width: 90%;
+            max-width: 450px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: modalSlideIn 0.3s ease-out;
+        }
+
+        .points-modal h2 {
+            font-size: 22px;
+            margin-bottom: 20px;
+            color: #667eea;
+            text-align: center;
+        }
+
+        .points-modal h4 {
+            font-size: 16px;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        #dailyCheckInSection:hover {
+            background: #c3e6cb !important;
+            transform: scale(1.02);
+            transition: all 0.2s;
+        }
+
+        .achievement-item {
+            text-align: center;
+            padding: 15px 10px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 10px;
+            color: white;
+            font-size: 13px;
+        }
+
+        .achievement-item .icon {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .achievement-item .name {
+            font-weight: bold;
+            margin-bottom: 3px;
+        }
+
+        .achievement-item .desc {
+            font-size: 11px;
+            opacity: 0.9;
+        }
+
+        .achievement-item.locked {
+            background: #e9ecef;
+            color: #999;
+        }
+
         .sync-status {
             position: absolute;
             top: 15px;
@@ -762,6 +823,24 @@
             box-shadow: 0 5px 15px rgba(108, 117, 125, 0.4);
         }
 
+        /* 挑战按钮样式 */
+        .challenge-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 14px;
+        }
+
+        .challenge-btn:hover {
+            background: linear-gradient(135deg, #5568d3 0%, #764ba2 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
         .selection-count {
             text-align: center;
             font-size: 14px;
@@ -1137,7 +1216,7 @@
                 <div class="tip-box">
                     💡 提示：不要筛选，不要排序，把脑子里所有想做的事情都写下来。每按一次回车，就会变成一张卡片。写完点击"我写完了"。
                 </div>
-                <div class="step-desc">
+                <div class="step-desc" id="step1Desc">
                     把你2026年想做的所有事情都写下来，不限数量，不用排序。让大脑清空。
                 </div>
                 <div class="input-area">
@@ -1154,6 +1233,21 @@
                 </div>
                 <div style="text-align: center;">
                     <button class="btn" onclick="goToStep2()">我写完了，下一步</button>
+                </div>
+
+                <!-- 挑战模式入口 -->
+                <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0;">
+                    <div style="text-align: center; margin-bottom: 15px;">
+                        <span style="font-size: 14px; color: #999;">🎯 想挑战不同专注模式？</span>
+                    </div>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px;">
+                        <button class="challenge-btn" onclick="openChallenge('daily1')">📅 一天1件事</button>
+                        <button class="challenge-btn" onclick="openChallenge('daily3')">📅 一天3件事</button>
+                        <button class="challenge-btn" onclick="openChallenge('weekly3')">📆 一周3件事</button>
+                        <button class="challenge-btn" onclick="openChallenge('monthly3')">🗓️ 一月3件事</button>
+                        <button class="challenge-btn" onclick="openChallenge('yearly3')">🎯 2026年3件事</button>
+                        <button class="challenge-btn" onclick="openChallenge('oneLife')">⭐ 一生1件事</button>
+                    </div>
                 </div>
             </div>
 
@@ -1223,6 +1317,24 @@
                     <button class="btn" onclick="dailyCheckin()" id="checkinBtn">今日打卡</button>
                 </div>
 
+                <div style="text-align: center; margin-top: 20px; padding: 15px; background: #fff3cd; border-radius: 10px; border: 1px solid #ffc107;">
+                    <h4 style="color: #856404; margin-bottom: 10px;">💰 我的积分</h4>
+                    <div style="display: flex; gap: 20px; justify-content: center; align-items: center; flex-wrap: wrap;">
+                        <div>
+                            <span style="font-size: 24px; font-weight: bold; color: #f39c12;" id="step5TotalPoints">0</span>
+                            <span style="font-size: 13px; color: #856404;">总积分</span>
+                        </div>
+                        <div>
+                            <span id="step5UserLevel" style="font-weight: bold;">LV1 专注新手</span>
+                            <span style="font-size: 13px; color: #856404;">等级</span>
+                        </div>
+                        <div>
+                            <span style="font-weight: bold; color: #e74c3c;" id="step5Streak">连续0天</span>
+                            <span style="font-size: 13px; color: #856404;">签到</span>
+                        </div>
+                    </div>
+                </div>
+
                 <div style="text-align: center; margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 10px; font-size: 13px; color: #666;">
                     <p style="margin-bottom: 8px;">💡 小提示：把这张专注卡设为手机壁纸</p>
                     <p>每天睁开眼就能看到，时刻提醒自己</p>
@@ -1233,6 +1345,7 @@
                     <p>让更多人用减法思维规划2026</p>
                     <button class="btn copy-link-btn" onclick="copyShareLink()">复制链接</button>
                     <span class="copy-success" id="copySuccess" style="display: none;">✓ 已复制</span>
+                    <p style="margin-top: 10px; font-size: 12px; color: #28a745;">分享获得 +15 积分</p>
                 </div>
 
                 <div style="text-align: center; margin-top: 15px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
@@ -1250,7 +1363,11 @@
                 <span class="dot"></span>
                 <span id="syncText">本地模式</span>
             </div>
-            <div class="bottom-actions">
+            <div class="bottom-actions" style="display: flex; gap: 8px; align-items: center;">
+                <button class="bottom-btn" onclick="showPointsModal()" style="color: #f39c12; border-color: #f39c12;">
+                    <span style="margin-right: 4px;">💰</span>
+                    <span id="totalPoints">0</span>分
+                </button>
                 <button class="bottom-btn" id="bottomLoginBtn" onclick="showLoginModal()">👤 登录</button>
                 <div id="bottomLoggedInActions" style="display: none; gap: 8px;">
                     <button class="bottom-btn" onclick="syncToCloud()">☁️ 同步</button>
@@ -1337,6 +1454,86 @@
         </div>
     </div>
 
+    <!-- 积分弹窗 -->
+    <div class="modal-overlay" id="pointsModal">
+        <div class="points-modal">
+            <button class="close-modal" onclick="hidePointsModal()">×</button>
+
+            <h2>💰 我的积分</h2>
+
+            <!-- 积分概览 -->
+            <div style="display: flex; gap: 15px; justify-content: center; margin-bottom: 25px; flex-wrap: wrap;">
+                <div style="text-align: center; padding: 15px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 10px; color: white; flex: 1; min-width: 100px;">
+                    <div style="font-size: 28px; font-weight: bold;" id="modalTotalPoints">0</div>
+                    <div style="font-size: 12px; opacity: 0.9;">总积分</div>
+                </div>
+                <div style="text-align: center; padding: 15px; background: #f39c12; border-radius: 10px; color: white; flex: 1; min-width: 100px;">
+                    <div id="modalUserLevel" style="font-weight: bold;">LV1 专注新手</div>
+                    <div style="font-size: 12px; opacity: 0.9;">当前等级</div>
+                </div>
+                <div style="text-align: center; padding: 15px; background: #e74c3c; border-radius: 10px; color: white; flex: 1; min-width: 100px;">
+                    <div style="font-size: 28px; font-weight: bold;" id="modalStreak">0</div>
+                    <div style="font-size: 12px; opacity: 0.9;">连续天数</div>
+                </div>
+            </div>
+
+            <!-- 等级进度 -->
+            <div style="margin-bottom: 20px;">
+                <div style="display: flex; justify-content: space-between; font-size: 13px; color: #666; margin-bottom: 5px;">
+                    <span>等级进度</span>
+                    <span id="levelProgress">0 / 100</span>
+                </div>
+                <div style="height: 8px; background: #e9ecef; border-radius: 4px; overflow: hidden;">
+                    <div id="levelProgressBar" style="height: 100%; background: linear-gradient(90deg, #667eea, #764ba2); width: 0%; transition: width 0.3s;"></div>
+                </div>
+            </div>
+
+            <!-- 每日签到 -->
+            <div id="dailyCheckInSection" style="text-align: center; padding: 15px; background: #d4edda; border-radius: 8px; margin-bottom: 20px; cursor: pointer;" onclick="dailyCheckIn()">
+                <h4 style="margin-bottom: 8px; color: #155724;">📅 每日签到</h4>
+                <p style="margin: 0; font-size: 13px; color: #155724;">签到获得 +10 积分，连续签到有额外奖励</p>
+            </div>
+
+            <!-- 积分获取方式 -->
+            <div style="margin-bottom: 20px;">
+                <h4 style="margin-bottom: 10px; color: #333;">🎯 积分获取</h4>
+                <div style="display: grid; gap: 10px;">
+                    <div style="display: flex; justify-content: space-between; padding: 10px; background: #f8f9fa; border-radius: 5px; font-size: 13px;">
+                        <span>每日签到</span>
+                        <span style="color: #28a745; font-weight: bold;">+10</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 10px; background: #f8f9fa; border-radius: 5px; font-size: 13px;">
+                        <span>完成专注卡</span>
+                        <span style="color: #28a745; font-weight: bold;">+50</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 10px; background: #f8f9fa; border-radius: 5px; font-size: 13px;">
+                        <span>分享专注卡</span>
+                        <span style="color: #28a745; font-weight: bold;">+15</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 10px; background: #f8f9fa; border-radius: 5px; font-size: 13px;">
+                        <span>连续7天</span>
+                        <span style="color: #f39c12; font-weight: bold;">+20</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 10px; background: #f8f9fa; border-radius: 5px; font-size: 13px;">
+                        <span>连续30天</span>
+                        <span style="color: #e74c3c; font-weight: bold;">+30</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 成就展示 -->
+            <div id="achievementsSection">
+                <h4 style="margin-bottom: 10px; color: #333;">🏆 我的成就</h4>
+                <div id="achievementsList" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px;">
+                    <!-- 成就会动态加载 -->
+                    <div style="text-align: center; padding: 15px; background: #f8f9fa; border-radius: 8px; color: #999; font-size: 13px; grid-column: 1 / -1;">
+                        暂无成就
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Toast 容器 -->
     <div class="toast" id="toast">
         <span class="toast-icon" id="toastIcon">✓</span>
@@ -1370,6 +1567,248 @@
         let audioContext = null;
         let currentUser = null;
         let isCloudMode = false;
+        let currentChallengeMode = 'yearly3'; // 默认模式
+
+        // ===== 积分系统 =====
+        let userPoints = {
+            total: 0,
+            level: 1,
+            checkInStreak: 0,
+            lastCheckInDate: null,
+            achievements: [],
+            history: []
+        };
+
+        // 等级配置
+        const levelConfig = {
+            1: { name: '专注新手', points: 0, color: '#95a5a6' },
+            2: { name: '专注达人', points: 100, color: '#3498db' },
+            3: { name: '专注高手', points: 500, color: '#9b59b6' },
+            4: { name: '专注大师', points: 1000, color: '#f39c12' },
+            5: { name: '专注王者', points: 3000, color: '#e74c3c' },
+            6: { name: '专注传奇', points: 10000, color: '#f1c40f' }
+        };
+
+        // 成就配置
+        const achievementConfig = {
+            firstCard: { name: '初入专注', desc: '完成第1张专注卡', points: 20, icon: '🌟' },
+            dailyCheckIn: { name: '每日打卡', desc: '连续签到7天', points: 50, icon: '📅' },
+            monthStreak: { name: '一月坚持', desc: '连续完成30天', points: 200, icon: '🔥' },
+            hundredDays: { name: '百日筑基', desc: '连续完成100天', points: 500, icon: '💎' },
+            yearAchievement: { name: '一年成就', desc: '连续完成365天', points: 1000, icon: '🏆' },
+            shareMaster: { name: '分享达人', desc: '分享专注卡10次', points: 100, icon: '📤' },
+            goalsCompleted: { name: '目标达成', desc: '完成所有设定的目标', points: 100, icon: '✅' }
+        };
+
+        // 获取积分
+        function addPoints(points, reason) {
+            userPoints.total += points;
+            userPoints.history.unshift({
+                points: points,
+                reason: reason,
+                date: new Date().toISOString()
+            });
+
+            // 更新等级
+            updateLevel();
+
+            // 保存到本地
+            localStorage.setItem('focus2026_points', JSON.stringify(userPoints));
+
+            // 显示提示
+            if (points > 0) {
+                showToast(`+${points}分 | ${reason}`, 'success');
+            }
+
+            // 同步到云端
+            if (isCloudMode && currentUser) {
+                syncPointsToCloud();
+            }
+        }
+
+        // 消耗积分
+        function usePoints(points, reason) {
+            if (userPoints.total < points) {
+                showToast('积分不足', 'error');
+                return false;
+            }
+
+            userPoints.total -= points;
+            userPoints.history.unshift({
+                points: -points,
+                reason: reason,
+                date: new Date().toISOString()
+            });
+
+            // 更新等级
+            updateLevel();
+
+            // 保存到本地
+            localStorage.setItem('focus2026_points', JSON.stringify(userPoints));
+
+            // 显示提示
+            showToast(`-${points}分 | ${reason}`, 'info');
+
+            // 同步到云端
+            if (isCloudMode && currentUser) {
+                syncPointsToCloud();
+            }
+
+            return true;
+        }
+
+        // 更新等级
+        function updateLevel() {
+            let newLevel = 1;
+            for (let level = 6; level >= 1; level--) {
+                if (userPoints.total >= levelConfig[level].points) {
+                    newLevel = level;
+                    break;
+                }
+            }
+
+            // 如果等级提升，显示通知
+            if (newLevel > userPoints.level) {
+                userPoints.level = newLevel;
+                showToast(`恭喜升级！获得「${levelConfig[newLevel].name}」称号`, 'success');
+            }
+        }
+
+        // 每日签到
+        function dailyCheckIn() {
+            const today = new Date().toDateString();
+            const yesterday = new Date(Date.now() - 86400000).toDateString();
+
+            if (userPoints.lastCheckInDate === today) {
+                showToast('今日已签到', 'info');
+                return;
+            }
+
+            // 计算连续签到
+            if (userPoints.lastCheckInDate === yesterday) {
+                userPoints.checkInStreak++;
+            } else {
+                userPoints.checkInStreak = 1;
+            }
+
+            userPoints.lastCheckInDate = today;
+
+            // 基础签到积分
+            let points = 10;
+
+            // 连续签到奖励
+            if (userPoints.checkInStreak >= 100) {
+                points += 30;
+                addAchievement('hundredDays');
+            } else if (userPoints.checkInStreak >= 30) {
+                points += 20;
+                addAchievement('monthStreak');
+            } else if (userPoints.checkInStreak >= 7) {
+                points += 10;
+                addAchievement('dailyCheckIn');
+            }
+
+            addPoints(points, '每日签到');
+        }
+
+        // 添加成就
+        function addAchievement(achievementId) {
+            if (!userPoints.achievements.includes(achievementId)) {
+                userPoints.achievements.push(achievementId);
+                const achievement = achievementConfig[achievementId];
+                addPoints(achievement.points, `解锁成就：${achievement.name}`);
+                showToast(`🏆 解锁成就：${achievement.name}`, 'success');
+            }
+        }
+
+        // 同步积分到云端
+        async function syncPointsToCloud() {
+            if (!supabaseClient || !currentUser) return;
+
+            try {
+                const { data, error } = await supabaseClient
+                    .from('user_points')
+                    .upsert({
+                        user_id: currentUser.id,
+                        total_points: userPoints.total,
+                        level: userPoints.level,
+                        check_in_streak: userPoints.checkInStreak,
+                        last_check_in_date: userPoints.lastCheckInDate,
+                        achievements: userPoints.achievements,
+                        points_history: userPoints.history.slice(0, 100) // 只保留最近100条
+                    }, {
+                        onConflict: 'user_id'
+                    });
+
+                if (error) throw error;
+
+                // 更新排行榜
+                await updateLeaderboard();
+            } catch (error) {
+                console.error('同步积分失败:', error);
+            }
+        }
+
+        // 更新排行榜
+        async function updateLeaderboard() {
+            if (!supabaseClient || !currentUser) return;
+
+            try {
+                const { data, error } = await supabaseClient
+                    .from('points_leaderboard')
+                    .upsert({
+                        user_id: currentUser.id,
+                        total_points: userPoints.total,
+                        level: userPoints.level,
+                        check_in_streak: userPoints.checkInStreak
+                    }, {
+                        onConflict: 'user_id'
+                    });
+
+                if (error) throw error;
+            } catch (error) {
+                console.error('更新排行榜失败:', error);
+            }
+        }
+
+        // 从本地加载积分
+        function loadPointsFromLocal() {
+            const pointsData = localStorage.getItem('focus2026_points');
+            if (pointsData) {
+                userPoints = JSON.parse(pointsData);
+                updatePointsDisplay();
+            }
+        }
+
+        // 更新积分显示
+        function updatePointsDisplay() {
+            const pointsEl = document.getElementById('totalPoints');
+            const levelEl = document.getElementById('userLevel');
+            const streakEl = document.getElementById('checkInStreak');
+
+            // 底部栏显示
+            if (pointsEl) pointsEl.textContent = userPoints.total;
+
+            // Step 5 显示
+            const step5PointsEl = document.getElementById('step5TotalPoints');
+            const step5LevelEl = document.getElementById('step5UserLevel');
+            const step5StreakEl = document.getElementById('step5Streak');
+
+            if (step5PointsEl) step5PointsEl.textContent = userPoints.total;
+            if (step5LevelEl) {
+                const levelInfo = levelConfig[userPoints.level];
+                step5LevelEl.textContent = `LV${userPoints.level} ${levelInfo.name}`;
+                step5LevelEl.style.color = levelInfo.color;
+            }
+            if (step5StreakEl) step5StreakEl.textContent = `连续${userPoints.checkInStreak}天`;
+
+            if (levelEl) {
+                const levelInfo = levelConfig[userPoints.level];
+                levelEl.textContent = `LV${userPoints.level} ${levelInfo.name}`;
+                levelEl.style.color = levelInfo.color;
+            }
+            if (streakEl) streakEl.textContent = `连续${userPoints.checkInStreak}天`;
+        }
 
         // ===== 全局函数定义（确保在所有位置都可用）=====
 
@@ -1750,11 +2189,26 @@
         // Step 2 -> Step 3
         function goToStep3() {
             const selected = allGoalsList.filter(g => g.selected);
-            if (selected.length !== 5) {
-                document.getElementById('step2Error').textContent = '请正好选择5个目标';
+            const modeConfig = challengeModes[currentChallengeMode] || challengeModes['yearly3'];
+
+            // 如果选中的数量不足5个，但至少有1个，允许继续
+            if (selected.length === 0) {
+                document.getElementById('step2Error').textContent = '请至少选择1个目标';
                 return;
             }
+
+            // 如果是默认模式，要求至少选择5个
+            if (currentChallengeMode === 'yearly3' && selected.length < 5) {
+                document.getElementById('step2Error').textContent = '请至少选择5个目标';
+                return;
+            }
+
             document.getElementById('step2Error').textContent = '';
+
+            // 如果选中的数量不足5个，显示提示
+            if (selected.length < 5) {
+                showToast(`已选择${selected.length}个目标，继续进入下一步`, 'info');
+            }
 
             top5Goals = selected.map(g => ({ ...g, selected: false }));
             saveToStorage(2);
@@ -1812,14 +2266,26 @@
         // Step 3 -> Step 4
         function goToStep4() {
             const selected = top5Goals.filter(g => g.selected);
-            if (selected.length !== 3) {
-                document.getElementById('step3Error').textContent = '请正好选择3个目标';
+            const modeConfig = challengeModes[currentChallengeMode] || challengeModes['yearly3'];
+
+            // 如果选中的数量为0，不能继续
+            if (selected.length === 0) {
+                document.getElementById('step3Error').textContent = '请至少选择1个目标';
                 return;
             }
-            document.getElementById('step3Error').textContent = '';
+
+            // 如果选中的数量不足3个，允许继续
+            if (selected.length < 3) {
+                document.getElementById('step3Error').textContent = '';
+                showToast(`已选择${selected.length}个目标，继续进入下一步`, 'info');
+            } else {
+                document.getElementById('step3Error').textContent = '';
+            }
 
             top3Goals = selected.map((g, index) => ({ ...g, weight: 0 }));
-            weights = [0, 0, 0];
+
+            // 初始化权重数组，根据选中的数量
+            weights = new Array(selected.length).fill(0);
             saveToStorage(3);
             goToStep(4);
             updateProgress(80);
@@ -1918,19 +2384,20 @@
             ctx.arc(canvas.width * 0.5, canvas.height * 0.5, 500, 0, Math.PI * 2);
             ctx.fill();
 
-            // 顶部标题区域
+            // 顶部标题区域 - 根据挑战模式动态显示
+            const modeConfig = challengeModes[currentChallengeMode] || challengeModes['yearly3'];
             ctx.fillStyle = 'white';
             ctx.font = 'bold 100px -apple-system, BlinkMacSystemFont, Arial, sans-serif';
             ctx.textAlign = 'center';
             ctx.shadowColor = 'rgba(0, 0, 0, 0.2)';
             ctx.shadowBlur = 20;
             ctx.shadowOffsetY = 10;
-            ctx.fillText('2026', canvas.width / 2, safeTop + 100);
+            ctx.fillText(modeConfig.year, canvas.width / 2, safeTop + 100);
 
             ctx.shadowColor = 'transparent';
             ctx.font = '500 42px -apple-system, BlinkMacSystemFont, Arial, sans-serif';
             ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
-            ctx.fillText('这一年，只做三件事', canvas.width / 2, safeTop + 170);
+            ctx.fillText(modeConfig.displayTitle, canvas.width / 2, safeTop + 170);
 
             // 添加装饰线
             ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
@@ -2037,6 +2504,18 @@
 
             saveToStorage(5);
             loadStreakData();
+
+            // 完成专注卡奖励
+            const firstCardKey = 'focus2026_first_card_completed';
+            if (!localStorage.getItem(firstCardKey)) {
+                addPoints(50, '完成专注卡');
+                addAchievement('firstCard');
+                localStorage.setItem(firstCardKey, 'true');
+            } else {
+                addPoints(50, '完成专注卡');
+            }
+
+            updatePointsDisplay();
         }
 
         // 下载专注卡
@@ -2057,6 +2536,87 @@
                 localStorage.removeItem('focus2026_streak');
                 location.reload();
             }
+        }
+
+        // 挑战模式配置
+        const challengeModes = {
+            daily1: { name: '一天1件事', year: '2026', displayTitle: '一天，只做一件事', count: 1, unit: '天', icon: '📅' },
+            daily3: { name: '一天3件事', year: '2026', displayTitle: '一天，只做三件事', count: 3, unit: '天', icon: '📅' },
+            weekly3: { name: '一周3件事', year: '2026', displayTitle: '一周，只做三件事', count: 3, unit: '周', icon: '📆' },
+            monthly3: { name: '一月3件事', year: '2026', displayTitle: '一月，只做三件事', count: 3, unit: '月', icon: '🗓️' },
+            yearly3: { name: '2026年3件事', year: '2026', displayTitle: '这一年，只做三件事', count: 3, unit: '年', icon: '🎯' },
+            oneLife: { name: '一生1件事', year: '一生', displayTitle: '一生，只做一件事', count: 1, unit: '一生', icon: '⭐' }
+        };
+
+        // 打开挑战模式
+        function openChallenge(mode) {
+            const config = challengeModes[mode];
+            currentChallengeMode = mode; // 保存当前选中的模式
+            const input = document.getElementById('allGoals');
+            const placeholder = config.count === 1
+                ? `输入你要专注的1件事（${config.unit}）...`
+                : `输入你要专注的${config.count}件事（${config.unit}），每行一个...`;
+
+            input.placeholder = placeholder;
+            input.rows = config.count > 3 ? '4' : '3';
+            input.style.display = 'block';
+            input.value = '';
+
+            // 更新Step 1描述文字
+            updateStep1Description();
+
+            // 隐藏其他步骤，只显示输入
+            document.querySelectorAll('.step').forEach(step => step.classList.remove('active'));
+            document.getElementById('step1').classList.add('active');
+
+            // 清空现有数据
+            allGoalsList = [];
+            top5Goals = [];
+            top3Goals = [];
+            weights = [0, 0, 0];
+
+            saveToStorage(0);
+            goToStep(1);
+            updateProgress(20);
+            updateGoalCount();
+
+            // 滚动到输入框
+            input.scrollIntoView({ behavior: 'smooth' });
+            input.focus();
+
+            playSelectSound();
+            showToast(`已切换到${config.name}模式`, 'info');
+        }
+
+        // 更新Step 1描述文字
+        function updateStep1Description() {
+            const descEl = document.getElementById('step1Desc');
+            const modeConfig = challengeModes[currentChallengeMode] || challengeModes['yearly3'];
+
+            // 根据模式生成对应的描述文字
+            let timeText = '';
+            switch (currentChallengeMode) {
+                case 'daily1':
+                case 'daily3':
+                    timeText = '今天';
+                    break;
+                case 'weekly3':
+                    timeText = '这周';
+                    break;
+                case 'monthly3':
+                    timeText = '这个月';
+                    break;
+                case 'yearly3':
+                    timeText = '2026年';
+                    break;
+                case 'oneLife':
+                    timeText = '一生';
+                    break;
+                default:
+                    timeText = '2026年';
+            }
+
+            descEl.textContent = `把你${timeText}想做的所有事情都写下来，不限数量，不用排序。让大脑清空。`;
         }
 
         // 返回重新选择目标
@@ -2273,6 +2833,7 @@
             if (navigator.clipboard && navigator.clipboard.writeText) {
                 navigator.clipboard.writeText(shareText).then(() => {
                     showCopySuccess();
+                    addPoints(15, '分享专注卡');
                 }).catch(() => {
                     fallbackCopy(shareText);
                 });
@@ -2361,6 +2922,86 @@
         // 隐藏登录弹窗
         function hideLoginModal() {
             document.getElementById('loginModal').classList.remove('show');
+        }
+
+        // 显示积分弹窗
+        function showPointsModal() {
+            updatePointsModal();
+            document.getElementById('pointsModal').classList.add('show');
+        }
+
+        // 隐藏积分弹窗
+        function hidePointsModal() {
+            document.getElementById('pointsModal').classList.remove('show');
+        }
+
+        // 更新积分弹窗内容
+        function updatePointsModal() {
+            // 更新积分概览
+            document.getElementById('modalTotalPoints').textContent = userPoints.total;
+            const levelInfo = levelConfig[userPoints.level];
+            document.getElementById('modalUserLevel').textContent = `LV${userPoints.level} ${levelInfo.name}`;
+            document.getElementById('modalUserLevel').style.color = levelInfo.color;
+            document.getElementById('modalStreak').textContent = userPoints.checkInStreak;
+
+            // 更新等级进度
+            const currentLevelPoints = levelConfig[userPoints.level].points;
+            const nextLevelPoints = levelConfig[userPoints.level + 1]
+                ? levelConfig[userPoints.level + 1].points
+                : currentLevelPoints * 2;
+            const progress = userPoints.total - currentLevelPoints;
+            const target = nextLevelPoints - currentLevelPoints;
+            const percent = Math.min((progress / target) * 100, 100);
+
+            document.getElementById('levelProgress').textContent = `${progress} / ${target}`;
+            document.getElementById('levelProgressBar').style.width = `${percent}%`;
+
+            // 更新每日签到状态
+            const today = new Date().toDateString();
+            const checkInSection = document.getElementById('dailyCheckInSection');
+            if (userPoints.lastCheckInDate === today) {
+                checkInSection.innerHTML = `
+                    <h4 style="margin-bottom: 8px; color: #155724;">✓ 今日已签到</h4>
+                    <p style="margin: 0; font-size: 13px; color: #155724;">明天再来签到吧</p>
+                `;
+                checkInSection.style.cursor = 'default';
+                checkInSection.onclick = null;
+            } else {
+                checkInSection.innerHTML = `
+                    <h4 style="margin-bottom: 8px; color: #155724;">📅 每日签到</h4>
+                    <p style="margin: 0; font-size: 13px; color: #155724;">签到获得 +10 积分，连续签到有额外奖励</p>
+                `;
+                checkInSection.style.cursor = 'pointer';
+                checkInSection.onclick = dailyCheckIn;
+            }
+
+            // 更新成就列表
+            updateAchievementsList();
+        }
+
+        // 更新成就列表
+        function updateAchievementsList() {
+            const container = document.getElementById('achievementsList');
+
+            if (userPoints.achievements.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 15px; background: #f8f9fa; border-radius: 8px; color: #999; font-size: 13px; grid-column: 1 / -1;">
+                        暂无成就，快去完成任务吧！
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = userPoints.achievements.map(id => {
+                const achievement = achievementConfig[id];
+                return `
+                    <div class="achievement-item">
+                        <div class="icon">${achievement.icon}</div>
+                        <div class="name">${achievement.name}</div>
+                        <div class="desc">+${achievement.points}分</div>
+                    </div>
+                `;
+            }).join('');
         }
 
         // 显示登录表单
@@ -2835,6 +3476,12 @@
         // 页面加载
         window.onload = async function() {
             console.log('页面加载完成');
+
+            // 初始化积分系统
+            loadPointsFromLocal();
+
+            // 初始化Step 1描述文字
+            updateStep1Description();
 
             // 绑定输入框事件
             const textarea = document.getElementById('allGoals');
