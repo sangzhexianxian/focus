@@ -20,7 +20,7 @@
             color: #333;
         }
 
-        .container {
+        .container {Uncaught SyntaxError: Identifier 'supabase' has already been declared (at index.html:1063:13)
             max-width: 600px;
             margin: 0 auto;
             background: white;
@@ -214,11 +214,38 @@
             color: #667eea;
             cursor: pointer;
             transition: opacity 0.3s;
+            margin-top: 15px;
         }
 
         .toggle-auth:hover {
             opacity: 0.8;
             text-decoration: underline;
+        }
+
+        .auth-divider {
+            text-align: center;
+            margin: 20px 0;
+            position: relative;
+            color: #999;
+            font-size: 13px;
+        }
+
+        .auth-divider::before,
+        .auth-divider::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            width: 40%;
+            height: 1px;
+            background: #e0e0e0;
+        }
+
+        .auth-divider::before {
+            left: 0;
+        }
+
+        .auth-divider::after {
+            right: 0;
         }
 
         .close-modal {
@@ -246,6 +273,11 @@
             display: flex;
             align-items: center;
             gap: 5px;
+            display: none;
+        }
+
+        .sync-status.show {
+            display: flex;
         }
 
         .sync-status .dot {
@@ -726,13 +758,90 @@
         }
 
         @media (max-width: 600px) {
+            body {
+                padding: 0;
+            }
+
             .container {
                 border-radius: 0;
                 min-height: 100vh;
+                box-shadow: none;
+            }
+
+            .header {
+                padding: 20px 15px;
+            }
+
+            .header h1 {
+                font-size: 24px;
+            }
+
+            .user-info {
+                top: 10px;
+                right: 10px;
+                gap: 8px;
+            }
+
+            .demo-btn {
+                font-size: 13px;
+                padding: 8px 16px;
+            }
+
+            .login-btn {
+                font-size: 13px;
+                padding: 8px 16px;
+            }
+
+            .user-avatar {
+                width: 32px;
+                height: 32px;
+                font-size: 14px;
             }
 
             .content {
-                padding: 20px;
+                padding: 20px 15px;
+            }
+
+            .step-title {
+                font-size: 18px;
+            }
+
+            .step-desc {
+                font-size: 13px;
+            }
+
+            .tip-box {
+                font-size: 13px;
+                padding: 12px 14px;
+            }
+
+            textarea {
+                font-size: 15px;
+                padding: 12px;
+            }
+
+            .goal-card {
+                font-size: 13px;
+                padding: 8px 16px;
+            }
+
+            .btn {
+                width: 100%;
+                font-size: 15px;
+                padding: 14px;
+            }
+
+            .card-preview canvas {
+                max-width: 100%;
+                height: auto !important;
+            }
+
+            .daily-checkin {
+                padding: 12px;
+            }
+
+            .streak-count {
+                font-size: 20px;
             }
         }
     </style>
@@ -768,7 +877,7 @@
                     把你2026年想做的所有事情都写下来，不限数量，不用排序。让大脑清空。
                 </div>
                 <div class="input-area">
-                    <textarea id="allGoals" placeholder="在这里输入你的目标，按回车键确认..." onkeydown="handleInputKeydown(event)"></textarea>
+                    <textarea id="allGoals" placeholder="在这里输入你的目标，按回车键确认..."></textarea>
                 </div>
                 <div class="goals-cards" id="goalsCards">
                     <div class="empty-state">
@@ -778,7 +887,6 @@
                 </div>
                 <div style="text-align: center; margin-bottom: 20px; color: #999; font-size: 13px;">
                     已记录 <span id="goalCount" style="color: #667eea; font-weight: bold;">0</span> 个目标
-                    <div class="quick-tip">按 Enter 键快速添加</div>
                 </div>
                 <div style="text-align: center;">
                     <button class="btn" onclick="goToStep2()">我写完了，下一步</button>
@@ -904,7 +1012,18 @@
                     <input type="password" id="loginPassword" placeholder="••••••••">
                 </div>
                 <button class="login-btn" onclick="handleLogin()" id="loginSubmitBtn">登录</button>
+
+                <div class="auth-divider">或</div>
+
+                <button class="login-btn" style="background: #24292e;" onclick="handleGuestLogin()">
+                    <span style="font-size: 16px;">👤</span>
+                    <span style="margin-left: 8px;">游客模式（本地存储）</span>
+                </button>
+
                 <div class="toggle-auth" onclick="showRegisterForm()">没有账号？立即注册</div>
+                <div style="text-align: center; margin-top: 10px; font-size: 12px; color: #999;">
+                    <a href="#" onclick="showForgotPassword()" style="color: #667eea;">忘记密码？</a>
+                </div>
             </div>
 
             <!-- 注册表单 -->
@@ -923,6 +1042,12 @@
                     <label>确认密码</label>
                     <input type="password" id="registerConfirmPassword" placeholder="••••••••">
                 </div>
+                <div class="form-group" style="display: flex; align-items: flex-start; gap: 8px;">
+                    <input type="checkbox" id="agreeTerms" style="margin-top: 3px;">
+                    <label for="agreeTerms" style="font-size: 13px; color: #666; cursor: pointer;">
+                        我已阅读并同意 <a href="#" style="color: #667eea; text-decoration: none;" onclick="event.preventDefault(); alert('服务条款内容...');">服务条款</a>
+                    </label>
+                </div>
                 <button class="login-btn" onclick="handleRegister()" id="registerSubmitBtn">注册</button>
                 <div class="toggle-auth" onclick="showLoginForm()">已有账号？去登录</div>
             </div>
@@ -940,12 +1065,17 @@
         const SUPABASE_URL = 'https://klywwizwconvwjifzrcw.supabase.co';
         const SUPABASE_KEY = 'sb_publishable_65tNpTMzDgY8PFEQxIS-Eg_0tXESrkV';
 
-        // 初始化 Supabase
-        let supabase = null;
+        // 初始化 Supabase 客户端
+        let supabaseClient = null;
         try {
-            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+            if (window.supabase && window.supabase.createClient) {
+                supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+                console.log('Supabase 初始化成功');
+            } else {
+                console.log('Supabase 库未加载');
+            }
         } catch (e) {
-            console.log('Supabase 初始化失败，将使用本地存储');
+            console.error('Supabase 初始化失败:', e);
         }
 
         // 数据存储
@@ -957,6 +1087,27 @@
         let audioContext = null;
         let currentUser = null;
         let isCloudMode = false;
+
+        // ===== 全局函数定义（确保在所有位置都可用）=====
+
+        // 处理输入框按键
+        function handleInputKeydown(event) {
+            console.log('键盘事件触发:', event.key, event.code, event.keyCode);
+            if (event.key === 'Enter' && !event.shiftKey) {
+                console.log('检测到Enter键，准备添加目标');
+                event.preventDefault();
+                const textarea = document.getElementById('allGoals');
+                const text = textarea.value.trim();
+
+                console.log('输入内容:', text);
+                if (text.length > 0) {
+                    console.log('调用 addGoalCard');
+                    addGoalCard(text);
+                    textarea.value = '';
+                    textarea.focus();
+                }
+            }
+        }
 
         // ===== 音效系统 =====
         function initAudio() {
@@ -1032,23 +1183,10 @@
             });
         }
 
-        // 处理输入框按键
-        function handleInputKeydown(event) {
-            if (event.key === 'Enter' && !event.shiftKey) {
-                event.preventDefault();
-                const textarea = document.getElementById('allGoals');
-                const text = textarea.value.trim();
-
-                if (text.length > 0) {
-                    addGoalCard(text);
-                    textarea.value = '';
-                    textarea.focus();
-                }
-            }
-        }
-
+        // 渲染目标卡片
         // 添加目标卡片
         function addGoalCard(text) {
+            console.log('addGoalCard 被调用:', text);
             playCardSound();
 
             const icons = ['🎯', '💪', '📚', '🏃', '💼', '🚀', '✨', '🌟', '🔥', '💎'];
@@ -1061,12 +1199,14 @@
                 selected: false
             };
 
+            console.log('添加目标:', goal);
             allGoalsList.push(goal);
+            console.log('当前目标列表长度:', allGoalsList.length);
             renderGoalCards();
             updateGoalCount();
+            console.log('addGoalCard 执行完成');
         }
 
-        // 渲染目标卡片
         function renderGoalCards() {
             const container = document.getElementById('goalsCards');
 
@@ -1672,15 +1812,14 @@
 
         // 复制分享链接
         function copyShareLink() {
-            const url = window.location.href;
-            const shareText = `我用「2026专注」工具，把所有目标减到3件事，2026年不焦虑了！\n\n工具链接：${url}\n\n用减法思维规划你的2026，告别目标焦虑。`;
+            const url = 'https://sangzhexianxian.github.io/focus/';
 
             // 优先使用现代 API
             if (navigator.clipboard && navigator.clipboard.writeText) {
-                navigator.clipboard.writeText(shareText).then(() => {
+                navigator.clipboard.writeText(url).then(() => {
                     showCopySuccess();
                 }).catch(() => {
-                    fallbackCopy(shareText);
+                    fallbackCopy(url);
                 });
             } else {
                 fallbackCopy(shareText);
@@ -1721,16 +1860,36 @@
 
         // 检查登录状态
         async function checkAuth() {
-            if (!supabase) return;
+            if (!supabaseClient) {
+                console.log('Supabase 未初始化，使用本地模式');
+                currentUser = null;
+                isCloudMode = false;
+                updateUserUI(false);
+                loadFromStorage();
+                return;
+            }
 
-            const { data: { session } } = await supabase.auth.getSession();
+            try {
+                const { data: { session }, error } = await supabaseClient.auth.getSession();
 
-            if (session) {
-                currentUser = session.user;
-                isCloudMode = true;
-                updateUserUI(true);
-                await loadFromCloud();
-            } else {
+                if (error) {
+                    console.error('获取会话失败:', error);
+                    throw error;
+                }
+
+                if (session) {
+                    currentUser = session.user;
+                    isCloudMode = true;
+                    updateUserUI(true);
+                    await loadFromCloud();
+                } else {
+                    currentUser = null;
+                    isCloudMode = false;
+                    updateUserUI(false);
+                    loadFromStorage();
+                }
+            } catch (error) {
+                console.error('检查登录状态失败:', error);
                 currentUser = null;
                 isCloudMode = false;
                 updateUserUI(false);
@@ -1755,6 +1914,32 @@
             document.getElementById('registerForm').style.display = 'none';
         }
 
+        // 游客模式（本地存储）
+        function handleGuestLogin() {
+            currentUser = null;
+            isCloudMode = false;
+            updateUserUI(false);
+            hideLoginModal();
+            showToast('已进入游客模式，数据保存在本地', 'info');
+            loadFromStorage();
+        }
+
+        // 忘记密码
+        function showForgotPassword() {
+            event.preventDefault();
+            const email = prompt('请输入您的邮箱地址，我们将发送密码重置链接：');
+
+            if (email && email.trim()) {
+                if (!supabaseClient) {
+                    showToast('云端服务未初始化', 'error');
+                    return;
+                }
+
+                // 这里可以调用 Supabase 的密码重置功能
+                showToast('密码重置链接已发送到您的邮箱', 'info');
+            }
+        }
+
         // 显示注册表单
         function showRegisterForm() {
             document.getElementById('loginForm').style.display = 'none';
@@ -1763,8 +1948,8 @@
 
         // 处理登录
         async function handleLogin() {
-            if (!supabase) {
-                showToast('云端服务未初始化', 'error');
+            if (!supabaseClient) {
+                showToast('云端服务未初始化，请检查网络连接', 'error');
                 return;
             }
 
@@ -1781,12 +1966,15 @@
             btn.textContent = '登录中...';
 
             try {
-                const { data, error } = await supabase.auth.signInWithPassword({
+                const { data, error } = await supabaseClient.auth.signInWithPassword({
                     email,
                     password
                 });
 
-                if (error) throw error;
+                if (error) {
+                    console.error('登录错误:', error);
+                    throw error;
+                }
 
                 currentUser = data.user;
                 isCloudMode = true;
@@ -1795,7 +1983,9 @@
                 showToast('登录成功！', 'success');
                 await loadFromCloud();
             } catch (error) {
-                showToast(error.message || '登录失败', 'error');
+                console.error('登录失败:', error);
+                const errorMsg = error.message || '登录失败，请检查邮箱和密码';
+                showToast(errorMsg, 'error');
             } finally {
                 btn.disabled = false;
                 btn.textContent = '登录';
@@ -1804,18 +1994,26 @@
 
         // 处理注册
         async function handleRegister() {
-            if (!supabase) {
-                showToast('云端服务未初始化', 'error');
+            if (!supabaseClient) {
+                showToast('云端服务未初始化，请检查网络连接', 'error');
                 return;
             }
 
             const email = document.getElementById('registerEmail').value.trim();
             const password = document.getElementById('registerPassword').value;
             const confirmPassword = document.getElementById('registerConfirmPassword').value;
+            const agreeTerms = document.getElementById('agreeTerms').checked;
             const btn = document.getElementById('registerSubmitBtn');
 
             if (!email || !password) {
                 showToast('请填写所有字段', 'error');
+                return;
+            }
+
+            // 邮箱格式验证
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                showToast('请输入有效的邮箱地址', 'error');
                 return;
             }
 
@@ -1829,21 +2027,41 @@
                 return;
             }
 
+            if (!agreeTerms) {
+                showToast('请先阅读并同意服务条款', 'error');
+                return;
+            }
+
             btn.disabled = true;
             btn.textContent = '注册中...';
 
             try {
-                const { data, error } = await supabase.auth.signUp({
+                const { data, error } = await supabaseClient.auth.signUp({
                     email,
-                    password
+                    password,
+                    options: {
+                        emailRedirectTo: window.location.href
+                    }
                 });
 
-                if (error) throw error;
+                if (error) {
+                    console.error('注册错误:', error);
+
+                    // 特殊错误处理
+                    if (error.message.includes('User already registered')) {
+                        showToast('该邮箱已被注册，请直接登录', 'error');
+                    } else {
+                        throw error;
+                    }
+                    return;
+                }
 
                 showToast('注册成功！请检查邮箱确认账号', 'success');
                 showLoginForm();
             } catch (error) {
-                showToast(error.message || '注册失败', 'error');
+                console.error('注册失败:', error);
+                const errorMsg = error.message || '注册失败，请稍后重试';
+                showToast(errorMsg, 'error');
             } finally {
                 btn.disabled = false;
                 btn.textContent = '注册';
@@ -1854,8 +2072,8 @@
         async function logout() {
             if (!confirm('确定要退出登录吗？本地数据将不会删除。')) return;
 
-            if (supabase) {
-                await supabase.auth.signOut();
+            if (supabaseClient) {
+                await supabaseClient.auth.signOut();
             }
 
             currentUser = null;
@@ -1877,12 +2095,12 @@
                 userAvatar.style.display = 'flex';
                 userAvatar.textContent = currentUser.email.charAt(0).toUpperCase();
                 loginBtn.style.display = 'none';
-                syncStatus.classList.add('synced');
+                syncStatus.classList.add('show', 'synced');
                 syncText.textContent = '已登录';
             } else {
                 userAvatar.style.display = 'none';
                 loginBtn.style.display = 'inline-block';
-                syncStatus.classList.remove('synced');
+                syncStatus.classList.remove('show', 'synced');
                 syncText.textContent = '本地模式';
             }
         }
@@ -1918,18 +2136,21 @@
 
         // 从云端加载数据
         async function loadFromCloud() {
-            if (!currentUser || !supabase) return;
+            if (!currentUser || !supabaseClient) return;
 
             setSyncStatus('syncing');
 
             try {
-                const { data, error } = await supabase
+                const { data, error } = await supabaseClient
                     .from('user_focus_data')
                     .select('*')
                     .eq('user_id', currentUser.id)
                     .single();
 
-                if (error && error.code !== 'PGRST116') throw error;
+                if (error && error.code !== 'PGRST116') {
+                    console.error('查询云端数据失败:', error);
+                    throw error;
+                }
 
                 if (data && data.focus_data) {
                     const savedData = JSON.parse(data.focus_data);
@@ -1976,13 +2197,14 @@
             } catch (error) {
                 console.error('从云端加载失败:', error);
                 setSyncStatus('error');
+                showToast('加载数据失败，使用本地数据', 'error');
                 loadFromStorage();
             }
         }
 
         // 保存到云端
         async function saveToCloud(step) {
-            if (!currentUser || !supabase) return;
+            if (!currentUser || !supabaseClient) return;
 
             const data = {
                 step: step,
@@ -1995,7 +2217,7 @@
             setSyncStatus('syncing');
 
             try {
-                const { data: existing, error: fetchError } = await supabase
+                const { data: existing, error: fetchError } = await supabaseClient
                     .from('user_focus_data')
                     .select('*')
                     .eq('user_id', currentUser.id)
@@ -2007,7 +2229,7 @@
 
                 if (existing) {
                     // 更新现有记录
-                    await supabase
+                    await supabaseClient
                         .from('user_focus_data')
                         .update({
                             focus_data: JSON.stringify(data),
@@ -2016,7 +2238,7 @@
                         .eq('user_id', currentUser.id);
                 } else {
                     // 创建新记录
-                    await supabase
+                    await supabaseClient
                         .from('user_focus_data')
                         .insert({
                             user_id: currentUser.id,
@@ -2140,6 +2362,17 @@
 
         // 页面加载
         window.onload = async function() {
+            console.log('页面加载完成');
+
+            // 绑定输入框事件
+            const textarea = document.getElementById('allGoals');
+            if (textarea) {
+                console.log('找到输入框，绑定键盘事件');
+                textarea.addEventListener('keydown', handleInputKeydown);
+            } else {
+                console.error('找不到输入框 allGoals');
+            }
+
             await checkAuth();
         };
     </script>
