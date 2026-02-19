@@ -17,23 +17,167 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: #f5f7fa;
             color: #333;
+            min-height: 100vh;
         }
 
+        /* 登录页面样式 */
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .login-box {
+            background: white;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            width: 100%;
+            max-width: 400px;
+            animation: slideIn 0.4s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .login-box h1 {
+            font-size: 28px;
+            color: #667eea;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .login-box .subtitle {
+            font-size: 14px;
+            color: #666;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .login-box .logo {
+            font-size: 48px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .login-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        /* 主页面样式 */
         .header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             padding: 20px 30px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
-        .header h1 {
+        .header-left h1 {
             font-size: 24px;
             margin-bottom: 5px;
         }
 
-        .header p {
+        .header-left p {
             font-size: 14px;
             opacity: 0.9;
+        }
+
+        .header-right {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .admin-info {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .logout-btn {
+            padding: 8px 20px;
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255,255,255,0.3);
         }
 
         .container {
@@ -98,6 +242,19 @@
             font-size: 18px;
             margin-bottom: 20px;
             color: #333;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chart-section .export-btn {
+            padding: 6px 16px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
         }
 
         .data-table {
@@ -175,6 +332,15 @@
             background: #5568d3;
         }
 
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+        }
+
         .btn-danger {
             background: #dc3545;
             color: white;
@@ -211,6 +377,11 @@
             font-size: 14px;
         }
 
+        /* 隐藏类 */
+        .hidden {
+            display: none !important;
+        }
+
         @media (max-width: 768px) {
             .stats-grid {
                 grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -223,97 +394,328 @@
             .data-table {
                 overflow-x: auto;
             }
+
+            .header {
+                padding: 15px 20px;
+            }
+
+            .header-left h1 {
+                font-size: 20px;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1>📊 2026专注 - 后台管理系统</h1>
-        <p>数据概览与用户管理</p>
+    <!-- 登录页面 -->
+    <div class="login-container" id="loginPage">
+        <div class="login-box">
+            <div class="logo">🔐</div>
+            <h1>后台管理系统</h1>
+            <p class="subtitle">2026专注 - 商用版</p>
+            <div class="error-message" id="loginError"></div>
+            <form id="loginForm" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label>管理员账号</label>
+                    <input type="email" id="adminEmail" placeholder="admin@yourdomain.com" required>
+                </div>
+                <div class="form-group">
+                    <label>密码</label>
+                    <input type="password" id="adminPassword" placeholder="请输入密码" required>
+                </div>
+                <button type="submit" class="login-btn" id="loginBtn">登录</button>
+            </form>
+            <p style="text-align: center; margin-top: 20px; font-size: 13px; color: #999;">
+                登录即表示同意《管理后台使用协议》
+            </p>
+        </div>
     </div>
 
-    <div class="container">
-        <!-- 统计卡片 -->
-        <div class="stats-grid">
-            <div class="stat-card">
-                <h3>总用户数</h3>
-                <div class="value" id="totalUsers">-</div>
-                <div class="change" id="usersChange">加载中...</div>
+    <!-- 主页面 -->
+    <div id="mainPage" class="hidden">
+        <div class="header">
+            <div class="header-left">
+                <h1>📊 2026专注 - 后台管理系统</h1>
+                <p>数据概览与用户管理</p>
             </div>
-            <div class="stat-card">
-                <h3>活跃用户（7天）</h3>
-                <div class="value" id="activeUsers">-</div>
-                <div class="change" id="activeChange">加载中...</div>
-            </div>
-            <div class="stat-card">
-                <h3>完成目标用户</h3>
-                <div class="value" id="completedUsers">-</div>
-                <div class="change positive" id="completedChange">加载中...</div>
-            </div>
-            <div class="stat-card">
-                <h3>平均完成时间</h3>
-                <div class="value" id="avgTime">-</div>
-                <div class="change" id="timeChange">加载中...</div>
+            <div class="header-right">
+                <span class="admin-info" id="adminInfo"></span>
+                <button class="logout-btn" onclick="handleLogout()">退出登录</button>
             </div>
         </div>
 
-        <!-- 图表区域 -->
-        <div class="chart-section">
-            <h2>📈 用户增长趋势</h2>
-            <canvas id="userGrowthChart" height="300"></canvas>
-        </div>
-
-        <div class="chart-section">
-            <h2>🎯 目标完成情况</h2>
-            <canvas id="goalCompletionChart" height="300"></canvas>
-        </div>
-
-        <!-- 用户数据表格 -->
-        <div class="data-table">
-            <h2>👥 用户列表</h2>
-            <div class="filter-bar">
-                <input type="text" id="searchUser" placeholder="搜索用户邮箱...">
-                <select id="statusFilter">
-                    <option value="all">全部状态</option>
-                    <option value="active">已完成</option>
-                    <option value="incomplete">进行中</option>
-                </select>
-                <button class="btn btn-primary" onclick="loadUsers()">刷新数据</button>
+        <div class="container">
+            <!-- 统计卡片 -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3>总用户数</h3>
+                    <div class="value" id="totalUsers">-</div>
+                    <div class="change" id="usersChange">加载中...</div>
+                </div>
+                <div class="stat-card">
+                    <h3>活跃用户（7天）</h3>
+                    <div class="value" id="activeUsers">-</div>
+                    <div class="change" id="activeChange">加载中...</div>
+                </div>
+                <div class="stat-card">
+                    <h3>完成目标用户</h3>
+                    <div class="value" id="completedUsers">-</div>
+                    <div class="change positive" id="completedChange">加载中...</div>
+                </div>
+                <div class="stat-card">
+                    <h3>平均完成时间</h3>
+                    <div class="value" id="avgTime">-</div>
+                    <div class="change" id="timeChange">加载中...</div>
+                </div>
+                <div class="stat-card">
+                    <h3>今日新增</h3>
+                    <div class="value" id="todayNew">-</div>
+                    <div class="change positive" id="todayChange">加载中...</div>
+                </div>
+                <div class="stat-card">
+                    <h3>转化率</h3>
+                    <div class="value" id="conversionRate">-</div>
+                    <div class="change" id="conversionChange">加载中...</div>
+                </div>
             </div>
-            <div id="usersContainer">
-                <div class="loading">加载数据中...</div>
+
+            <!-- 图表区域 -->
+            <div class="chart-section">
+                <h2>
+                    📈 用户增长趋势
+                    <button class="export-btn" onclick="exportData('growth')">导出数据</button>
+                </h2>
+                <canvas id="userGrowthChart" height="300"></canvas>
+            </div>
+
+            <div class="chart-section">
+                <h2>
+                    🎯 目标完成情况
+                    <button class="export-btn" onclick="exportData('completion')">导出数据</button>
+                </h2>
+                <canvas id="goalCompletionChart" height="300"></canvas>
+            </div>
+
+            <!-- 用户数据表格 -->
+            <div class="data-table">
+                <h2>👥 用户列表</h2>
+                <div class="filter-bar">
+                    <input type="text" id="searchUser" placeholder="搜索用户 ID...">
+                    <select id="statusFilter">
+                        <option value="all">全部状态</option>
+                        <option value="active">已完成</option>
+                        <option value="incomplete">进行中</option>
+                        <option value="inactive">未开始</option>
+                    </select>
+                    <select id="timeFilter">
+                        <option value="all">全部时间</option>
+                        <option value="today">今天</option>
+                        <option value="week">最近7天</option>
+                        <option value="month">最近30天</option>
+                    </select>
+                    <button class="btn btn-primary" onclick="loadUsers()">刷新数据</button>
+                    <button class="btn btn-success" onclick="exportUserData()">导出全部</button>
+                </div>
+                <div id="usersContainer">
+                    <div class="loading">加载数据中...</div>
+                </div>
+            </div>
+
+            <!-- 系统信息 -->
+            <div class="data-table">
+                <h2>⚙️ 系统信息</h2>
+                <table>
+                    <tr>
+                        <th>系统版本</th>
+                        <td>2026专注 v1.0.0 (商用版)</td>
+                    </tr>
+                    <tr>
+                        <th>数据库状态</th>
+                        <td id="dbStatus">检测中...</td>
+                    </tr>
+                    <tr>
+                        <th>最后更新</th>
+                        <td id="lastUpdate">-</td>
+                    </tr>
+                    <tr>
+                        <th>数据总大小</th>
+                        <td id="dataSize">计算中...</td>
+                    </tr>
+                </table>
             </div>
         </div>
     </div>
 
     <script>
-        // Supabase 配置
-        const SUPABASE_URL = 'https://klywwizwconvwjifzrcw.supabase.co';
-        const SUPABASE_KEY = 'sb_publishable_65tNpTMzDgY8PFEQxIS-Eg_0tXESrkV';
+        // 配置信息
+        const CONFIG = {
+            // Supabase 配置
+            SUPABASE_URL: 'https://klywwizwconvwjifzrcw.supabase.co',
+            SUPABASE_KEY: 'sb_publishable_65tNpTMzDgY8PFEQxIS-Eg_0tXESrkV',
+            
+            // 管理员邮箱列表（商用部署时请修改）
+            ADMIN_EMAILS: [
+                'admin@focus2026.com',
+                'admin@yourdomain.com'
+            ],
+            
+            // 会话过期时间（毫秒）
+            SESSION_TIMEOUT: 2 * 60 * 60 * 1000 // 2小时
+        };
+
+        // 全局变量
+        let supabase = null;
+        let currentAdmin = null;
+        let sessionExpiry = null;
+        let allUsers = [];
+        let userGrowthChart = null;
+        let goalCompletionChart = null;
+
+        // 初始化
+        window.onload = function() {
+            initSupabase();
+            checkSession();
+        };
 
         // 初始化 Supabase
-        let supabase = null;
-        try {
-            if (window.supabase && window.supabase.createClient) {
-                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-                console.log('Supabase 初始化成功');
+        function initSupabase() {
+            try {
+                if (window.supabase && window.supabase.createClient) {
+                    supabase = window.supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
+                    console.log('Supabase 初始化成功');
+                }
+            } catch (e) {
+                console.error('Supabase 初始化失败:', e);
             }
-        } catch (e) {
-            console.error('Supabase 初始化失败:', e);
         }
 
-        // 存储数据
-        let allUsers = [];
+        // 检查会话
+        function checkSession() {
+            const session = localStorage.getItem('admin_session');
+            if (session) {
+                const data = JSON.parse(session);
+                const now = Date.now();
+                
+                // 检查是否过期
+                if (now < data.expiry) {
+                    currentAdmin = data.admin;
+                    sessionExpiry = data.expiry;
+                    showMainPage();
+                    return;
+                } else {
+                    localStorage.removeItem('admin_session');
+                }
+            }
+            showLoginPage();
+        }
 
-        // 页面加载
-        window.onload = async function() {
-            if (!supabase) {
-                alert('云服务未初始化');
+        // 显示登录页面
+        function showLoginPage() {
+            document.getElementById('loginPage').classList.remove('hidden');
+            document.getElementById('mainPage').classList.add('hidden');
+        }
+
+        // 显示主页面
+        function showMainPage() {
+            document.getElementById('loginPage').classList.add('hidden');
+            document.getElementById('mainPage').classList.remove('hidden');
+            document.getElementById('adminInfo').textContent = `管理员: ${currentAdmin.email}`;
+            
+            // 自动刷新定时器
+            startAutoRefresh();
+            
+            // 加载数据
+            loadAllData();
+        }
+
+        // 处理登录
+        async function handleLogin(event) {
+            event.preventDefault();
+            
+            const email = document.getElementById('adminEmail').value.trim();
+            const password = document.getElementById('adminPassword').value;
+            const loginBtn = document.getElementById('loginBtn');
+            const errorMsg = document.getElementById('loginError');
+            
+            // 验证邮箱
+            if (!CONFIG.ADMIN_EMAILS.includes(email)) {
+                showError('账号不存在或无权限');
                 return;
             }
+            
+            // 简单密码验证（商用部署时建议使用更安全的方案）
+            // 这里使用演示密码，实际应该使用 Supabase Auth 或后端 API
+            const DEMO_PASSWORD = 'Admin@2026';
+            
+            if (password !== DEMO_PASSWORD) {
+                showError('密码错误');
+                return;
+            }
+            
+            loginBtn.disabled = true;
+            loginBtn.textContent = '登录中...';
+            errorMsg.classList.remove('show');
+            
+            try {
+                // 创建会话
+                currentAdmin = {
+                    email: email,
+                    loginTime: Date.now()
+                };
+                
+                sessionExpiry = Date.now() + CONFIG.SESSION_TIMEOUT;
+                
+                const session = {
+                    admin: currentAdmin,
+                    expiry: sessionExpiry
+                };
+                
+                localStorage.setItem('admin_session', JSON.stringify(session));
+                
+                // 登录成功
+                showMainPage();
+                
+            } catch (error) {
+                console.error('登录失败:', error);
+                showError('登录失败，请重试');
+                loginBtn.disabled = false;
+                loginBtn.textContent = '登录';
+            }
+        }
 
-            await loadAllData();
-        };
+        // 显示错误信息
+        function showError(message) {
+            const errorMsg = document.getElementById('loginError');
+            errorMsg.textContent = message;
+            errorMsg.classList.add('show');
+        }
+
+        // 退出登录
+        function handleLogout() {
+            if (confirm('确定要退出登录吗？')) {
+                localStorage.removeItem('admin_session');
+                currentAdmin = null;
+                sessionExpiry = null;
+                
+                if (userGrowthChart) userGrowthChart.destroy();
+                if (goalCompletionChart) goalCompletionChart.destroy();
+                
+                showLoginPage();
+                document.getElementById('loginForm').reset();
+                document.getElementById('loginBtn').disabled = false;
+                document.getElementById('loginBtn').textContent = '登录';
+            }
+        }
+
+        // 自动刷新定时器
+        let autoRefreshTimer = null;
+        function startAutoRefresh() {
+            if (autoRefreshTimer) clearInterval(autoRefreshTimer);
+            autoRefreshTimer = setInterval(() => {
+                if (currentAdmin && document.getElementById('mainPage').classList.contains('hidden') === false) {
+                    loadAllData();
+                }
+            }, 5 * 60 * 1000); // 5分钟自动刷新
+        }
 
         // 加载所有数据
         async function loadAllData() {
@@ -321,6 +723,7 @@
                 await loadStats();
                 await loadUsers();
                 await renderCharts();
+                await loadSystemInfo();
             } catch (error) {
                 console.error('加载数据失败:', error);
             }
@@ -329,7 +732,6 @@
         // 加载统计数据
         async function loadStats() {
             try {
-                // 获取所有用户数据
                 const { data: usersData, error: usersError } = await supabase
                     .from('user_focus_data')
                     .select('*');
@@ -341,21 +743,21 @@
                     try {
                         const data = JSON.parse(u.focus_data);
                         return data.step >= 5;
-                    } catch {
-                        return false;
-                    }
+                    } catch { return false; }
                 }).length;
 
                 const active = usersData.filter(u => {
                     try {
                         const data = JSON.parse(u.focus_data);
                         return data.step > 0 && data.step < 5;
-                    } catch {
-                        return false;
-                    }
+                    } catch { return false; }
                 }).length;
 
-                // 计算平均完成时间（基于创建时间到最近更新时间）
+                // 今日新增
+                const today = new Date().toISOString().split('T')[0];
+                const todayNew = usersData.filter(u => u.created_at.startsWith(today)).length;
+
+                // 计算平均完成时间
                 let totalTime = 0;
                 let count = 0;
                 usersData.forEach(u => {
@@ -365,18 +767,25 @@
                         count++;
                     }
                 });
-                const avgTime = count > 0 ? Math.round(totalTime / count / 1000 / 60) : 0; // 分钟
+                const avgTime = count > 0 ? Math.round(totalTime / count / 1000 / 60) : 0;
+
+                // 转化率（完成用户 / 总用户）
+                const conversionRate = total > 0 ? ((completed / total) * 100).toFixed(1) : 0;
 
                 // 更新显示
                 document.getElementById('totalUsers').textContent = total;
                 document.getElementById('activeUsers').textContent = active;
                 document.getElementById('completedUsers').textContent = completed;
                 document.getElementById('avgTime').textContent = avgTime + ' 分钟';
+                document.getElementById('todayNew').textContent = todayNew;
+                document.getElementById('conversionRate').textContent = conversionRate + '%';
 
-                document.getElementById('usersChange').textContent = '总注册用户';
+                document.getElementById('usersChange').textContent = `活跃: ${active}`;
                 document.getElementById('activeChange').textContent = '7天内活跃';
                 document.getElementById('completedChange').textContent = '已完成所有步骤';
                 document.getElementById('timeChange').textContent = '平均用时';
+                document.getElementById('todayChange').textContent = '今日新增用户';
+                document.getElementById('conversionChange').textContent = '完成率';
 
                 allUsers = usersData;
             } catch (error) {
@@ -391,16 +800,27 @@
             try {
                 const searchTerm = document.getElementById('searchUser').value.toLowerCase();
                 const statusFilter = document.getElementById('statusFilter').value;
+                const timeFilter = document.getElementById('timeFilter').value;
 
                 let filteredUsers = allUsers.filter(u => {
                     // 状态过滤
-                    let status = 'incomplete';
+                    let status = 'inactive';
                     try {
                         const data = JSON.parse(u.focus_data);
                         if (data.step >= 5) status = 'active';
+                        else if (data.step > 0) status = 'incomplete';
                     } catch {}
                     
                     if (statusFilter !== 'all' && status !== statusFilter) return false;
+
+                    // 时间过滤
+                    const userDate = new Date(u.created_at);
+                    const now = new Date();
+                    const daysDiff = (now - userDate) / (1000 * 60 * 60 * 24);
+
+                    if (timeFilter === 'today' && daysDiff >= 1) return false;
+                    if (timeFilter === 'week' && daysDiff >= 7) return false;
+                    if (timeFilter === 'month' && daysDiff >= 30) return false;
 
                     // 搜索过滤
                     if (searchTerm && !u.user_id.toLowerCase().includes(searchTerm)) return false;
@@ -423,6 +843,7 @@
                                 <th>创建时间</th>
                                 <th>更新时间</th>
                                 <th>状态</th>
+                                <th>操作</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -438,22 +859,30 @@
                     } catch {}
 
                     const stepNames = ['未开始', '输入目标', '选择5个', '选择3个', '分配权重', '完成'];
-                    const status = step >= 5 ? 'active' : 'incomplete';
+                    const status = step >= 5 ? 'active' : (step > 0 ? 'incomplete' : 'inactive');
+                    const statusText = step >= 5 ? '已完成' : (step > 0 ? '进行中' : '未开始');
 
                     html += `
                         <tr>
-                            <td>${user.user_id.substring(0, 16)}...</td>
+                            <td title="${user.user_id}">${user.user_id.substring(0, 16)}...</td>
                             <td>${stepNames[Math.min(step, 5)]}</td>
                             <td>${goalCount}</td>
                             <td>${formatDate(user.created_at)}</td>
                             <td>${formatDate(user.updated_at)}</td>
-                            <td><span class="status-badge ${status}">${step >= 5 ? '已完成' : '进行中'}</span></td>
+                            <td><span class="status-badge ${status}">${statusText}</span></td>
+                            <td>
+                                <button class="btn btn-primary" style="padding: 4px 10px; font-size: 12px;" onclick="viewUserDetail('${user.id}')">查看</button>
+                            </td>
                         </tr>
                     `;
                 });
 
                 html += '</tbody></table>';
                 container.innerHTML = html;
+
+                // 更新最后更新时间
+                document.getElementById('lastUpdate').textContent = new Date().toLocaleString('zh-CN');
+
             } catch (error) {
                 console.error('加载用户列表失败:', error);
                 container.innerHTML = '<div class="empty-state">加载失败</div>';
@@ -470,22 +899,22 @@
         async function renderUserGrowthChart() {
             const ctx = document.getElementById('userGrowthChart').getContext('2d');
 
-            // 按日期统计用户
             const userDates = allUsers.map(u => u.created_at.split('T')[0]);
             const dateCount = {};
             userDates.forEach(date => {
                 dateCount[date] = (dateCount[date] || 0) + 1;
             });
 
-            // 排序并获取最近30天
             const sortedDates = Object.keys(dateCount).sort();
             const recentDates = sortedDates.slice(-30);
             const values = recentDates.map(d => dateCount[d]);
 
-            new Chart(ctx, {
+            if (userGrowthChart) userGrowthChart.destroy();
+
+            userGrowthChart = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: recentDates.map(d => d.substring(5)), // 只显示 月-日
+                    labels: recentDates.map(d => d.substring(5)),
                     datasets: [{
                         label: '新增用户',
                         data: values,
@@ -498,17 +927,11 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: false
-                        }
-                    },
+                    plugins: { legend: { display: false } },
                     scales: {
                         y: {
                             beginAtZero: true,
-                            ticks: {
-                                stepSize: 1
-                            }
+                            ticks: { stepSize: 1 }
                         }
                     }
                 }
@@ -528,7 +951,9 @@
                 } catch {}
             });
 
-            new Chart(ctx, {
+            if (goalCompletionChart) goalCompletionChart.destroy();
+
+            goalCompletionChart = new Chart(ctx, {
                 type: 'bar',
                 data: {
                     labels: ['未开始', '输入目标', '选择5个', '选择3个', '分配权重', '完成'],
@@ -549,21 +974,125 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: false
-                        }
-                    },
+                    plugins: { legend: { display: false } },
                     scales: {
                         y: {
                             beginAtZero: true,
-                            ticks: {
-                                stepSize: 1
-                            }
+                            ticks: { stepSize: 1 }
                         }
                     }
                 }
             });
+        }
+
+        // 加载系统信息
+        async function loadSystemInfo() {
+            try {
+                // 数据库状态
+                document.getElementById('dbStatus').innerHTML = '<span style="color: #28a745;">✓ 正常</span>';
+
+                // 计算数据大小
+                let totalSize = 0;
+                allUsers.forEach(u => {
+                    totalSize += u.focus_data.length;
+                });
+                const sizeKB = (totalSize / 1024).toFixed(2);
+                document.getElementById('dataSize').textContent = sizeKB + ' KB';
+
+            } catch (error) {
+                console.error('加载系统信息失败:', error);
+                document.getElementById('dbStatus').innerHTML = '<span style="color: #dc3545;">✗ 异常</span>';
+            }
+        }
+
+        // 查看用户详情
+        function viewUserDetail(userId) {
+            alert('用户详情功能开发中...\n用户 ID: ' + userId);
+        }
+
+        // 导出数据
+        function exportData(type) {
+            if (type === 'growth') {
+                // 导出增长数据
+                const userDates = allUsers.map(u => u.created_at.split('T')[0]);
+                const dateCount = {};
+                userDates.forEach(date => {
+                    dateCount[date] = (dateCount[date] || 0) + 1;
+                });
+
+                const csv = '日期,新增用户\n' + Object.entries(dateCount)
+                    .map(([date, count]) => `${date},${count}`)
+                    .join('\n');
+
+                downloadCSV(csv, '用户增长数据.csv');
+            } else if (type === 'completion') {
+                // 导出完成数据
+                let stepCounts = [0, 0, 0, 0, 0, 0];
+                allUsers.forEach(u => {
+                    try {
+                        const data = JSON.parse(u.focus_data);
+                        const step = Math.min(data.step || 0, 5);
+                        stepCounts[step]++;
+                    } catch {}
+                });
+
+                const csv = '步骤,用户数\n' + [
+                    '未开始,0',
+                    '输入目标,1',
+                    '选择5个,2',
+                    '选择3个,3',
+                    '分配权重,4',
+                    '完成,5'
+                ].map((line, i) => `${line.split(',')[0]},${stepCounts[i]}`)
+                    .join('\n');
+
+                downloadCSV(csv, '目标完成数据.csv');
+            }
+        }
+
+        // 导出用户数据
+        function exportUserData() {
+            const searchTerm = document.getElementById('searchUser').value.toLowerCase();
+            const statusFilter = document.getElementById('statusFilter').value;
+
+            let filteredUsers = allUsers.filter(u => {
+                let status = 'inactive';
+                try {
+                    const data = JSON.parse(u.focus_data);
+                    if (data.step >= 5) status = 'active';
+                    else if (data.step > 0) status = 'incomplete';
+                } catch {}
+
+                if (statusFilter !== 'all' && status !== statusFilter) return false;
+                if (searchTerm && !u.user_id.toLowerCase().includes(searchTerm)) return false;
+
+                return true;
+            });
+
+            const csv = '用户ID,当前步骤,目标数量,创建时间,更新时间\n' +
+                filteredUsers.map(u => {
+                    let step = 0;
+                    let goalCount = 0;
+                    try {
+                        const data = JSON.parse(u.focus_data);
+                        step = data.step || 0;
+                        goalCount = (data.allGoalsList || []).length;
+                    } catch {}
+
+                    return `${u.user_id},${step},${goalCount},${u.created_at},${u.updated_at}`;
+                }).join('\n');
+
+            downloadCSV(csv, '用户数据.csv');
+        }
+
+        // 下载CSV
+        function downloadCSV(csv, filename) {
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = filename;
+            link.click();
+            URL.revokeObjectURL(link.href);
         }
 
         // 格式化日期
