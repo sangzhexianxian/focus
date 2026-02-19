@@ -301,6 +301,74 @@
             50% { opacity: 0.5; }
         }
 
+        /* 底部操作栏 */
+        .bottom-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid #e0e0e0;
+            padding: 12px 20px;
+            z-index: 100;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+        }
+
+        .bottom-bar-content {
+            max-width: 600px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .bottom-bar .sync-status {
+            position: static;
+            display: flex;
+            color: #666;
+            font-size: 13px;
+        }
+
+        .bottom-bar .sync-status.show {
+            display: flex;
+        }
+
+        .bottom-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .bottom-btn {
+            padding: 8px 16px;
+            border: 1px solid #e0e0e0;
+            border-radius: 20px;
+            background: #f8f9fa;
+            color: #333;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .bottom-btn:hover {
+            background: #e9ecef;
+            border-color: #ccc;
+        }
+
+        .bottom-btn.danger {
+            color: #dc3545;
+            border-color: #ffcdd2;
+            background: #fff5f5;
+        }
+
+        .bottom-btn.danger:hover {
+            background: #ffcdd2;
+        }
+
+        /* 为底部栏留出空间 */
+        .container {
+            margin-bottom: 60px;
+        }
+
         .header h1 {
             font-size: 28px;
             margin-bottom: 10px;
@@ -568,15 +636,27 @@
             cursor: pointer;
             transition: all 0.2s;
             border: 2px solid transparent;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
         }
 
         .goal-item:hover {
             background: #e9ecef;
         }
 
+        .goal-item:active {
+            transform: scale(0.98);
+            background: #e0e0e0;
+        }
+
         .goal-item.selected {
             border-color: #667eea;
             background: #f0f4ff;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+        }
+
+        .goal-item.selected:active {
+            background: #e8edff;
         }
 
         .goal-item .checkbox {
@@ -773,18 +853,35 @@
             }
 
             .header h1 {
-                font-size: 24px;
+                font-size: 28px !important;
+                letter-spacing: 1px !important;
+            }
+
+            .header p {
+                font-size: 14px !important;
             }
 
             .user-info {
                 top: 10px;
                 right: 10px;
-                gap: 8px;
+                gap: 6px;
+                flex-wrap: wrap;
+                justify-content: flex-end;
+                max-width: 70%;
             }
 
             .demo-btn {
-                font-size: 13px;
-                padding: 8px 16px;
+                font-size: 12px;
+                padding: 6px 12px;
+            }
+
+            #loggedInActions {
+                gap: 4px !important;
+            }
+
+            #loggedInActions .demo-btn {
+                padding: 6px 10px !important;
+                font-size: 11px !important;
             }
 
             .login-btn {
@@ -843,23 +940,187 @@
             .streak-count {
                 font-size: 20px;
             }
+
+            /* 优化选择列表在移动端的触摸体验 */
+            .goal-item {
+                padding: 16px 12px;
+                margin-bottom: 12px;
+                min-height: 56px;
+            }
+
+            .goal-item .checkbox {
+                width: 28px;
+                height: 28px;
+                margin-right: 14px;
+            }
+
+            .goal-item .text {
+                font-size: 15px;
+                line-height: 1.5;
+            }
+
+            .selection-count {
+                font-size: 16px;
+                padding: 10px;
+                background: rgba(102, 126, 234, 0.1);
+                border-radius: 8px;
+                margin-bottom: 15px;
+            }
+
+            /* 权重滑块在移动端的优化 */
+            .weight-slider {
+                height: 40px;
+                -webkit-appearance: none;
+                appearance: none;
+                background: #e0e0e0;
+                border-radius: 20px;
+                outline: none;
+            }
+
+            .weight-slider::-webkit-slider-thumb {
+                -webkit-appearance: none;
+                appearance: none;
+                width: 32px;
+                height: 32px;
+                border-radius: 50%;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                cursor: pointer;
+                box-shadow: 0 2px 8px rgba(102, 126, 234, 0.4);
+            }
+
+            .weight-slider::-moz-range-thumb {
+                width: 32px;
+                height: 32px;
+                border-radius: 50%;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                cursor: pointer;
+                border: none;
+                box-shadow: 0 2px 8px rgba(102, 126, 234, 0.4);
+            }
+
+            .weight-item {
+                padding: 15px;
+                background: #f8f9fa;
+                border-radius: 12px;
+                margin-bottom: 15px;
+            }
+
+            .weight-label {
+                font-size: 15px;
+                font-weight: 500;
+                margin-bottom: 12px;
+            }
+
+            /* 重新选择按钮在移动端的优化 */
+            .btn.restart-btn {
+                font-size: 14px;
+                padding: 12px 20px;
+                flex: 1;
+                min-width: 140px;
+            }
+
+            /* 登录弹窗在移动端的优化 */
+            .login-modal {
+                padding: 30px 20px;
+                width: 95%;
+            }
+
+            .login-modal h2 {
+                font-size: 22px;
+            }
+
+            .form-group input {
+                padding: 14px;
+                font-size: 16px; /* 防止iOS缩放 */
+            }
+
+            .login-btn {
+                padding: 16px;
+                font-size: 16px;
+            }
+
+            /* 用户菜单在移动端的优化 */
+            .user-menu {
+                right: 10px;
+                min-width: 160px;
+            }
+
+            .user-menu-item {
+                padding: 14px 16px;
+                font-size: 15px;
+            }
+
+            /* 目标卡片在移动端的优化 */
+            .goals-cards {
+                gap: 8px;
+            }
+
+            .goal-card {
+                font-size: 14px;
+                padding: 10px 16px;
+                border-radius: 20px;
+            }
+
+            /* Toast提示在移动端的优化 */
+            .toast {
+                padding: 14px 20px;
+                font-size: 14px;
+                max-width: 90%;
+            }
+
+            /* 分享区域在移动端的优化 */
+            .share-section {
+                padding: 15px;
+            }
+
+            .share-section h4 {
+                font-size: 16px;
+            }
+
+            /* 每日打卡在移动端的优化 */
+            .daily-checkin {
+                padding: 20px 15px;
+            }
+
+            .daily-checkin h4 {
+                font-size: 16px;
+            }
+
+            #checkinBtn {
+                width: auto;
+                min-width: 120px;
+            }
+
+            /* 底部栏在移动端的优化 */
+            .bottom-bar {
+                padding: 10px 15px;
+            }
+
+            .bottom-bar-content {
+                gap: 10px;
+            }
+
+            .bottom-bar .sync-status {
+                font-size: 11px;
+                white-space: nowrap;
+            }
+
+            .bottom-btn {
+                padding: 6px 12px;
+                font-size: 12px;
+            }
+
+            .container {
+                margin-bottom: 55px;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <div class="sync-status" id="syncStatus">
-                <span class="dot"></span>
-                <span id="syncText">本地模式</span>
-            </div>
-            <div class="user-info">
-                <button class="demo-btn" onclick="startDemo()">▶ 演示</button>
-                <div class="user-avatar" id="userAvatar" onclick="toggleUserMenu()" style="display: none;">👤</div>
-                <button class="demo-btn" id="loginBtn" onclick="showLoginModal()">登录</button>
-            </div>
-            <h1>2026专注</h1>
-            <p>这一年，只做三件事</p>
+            <h1 style="font-size: 42px; font-weight: 900; letter-spacing: 2px; text-shadow: 0 4px 20px rgba(0,0,0,0.3);">2026 · 只做3件事</h1>
+            <p style="font-size: 16px; opacity: 0.95; font-weight: 500; letter-spacing: 1px; margin-top: 8px;">其他的，都放弃</p>
         </div>
 
         <div class="content">
@@ -869,7 +1130,10 @@
 
             <!-- Step 1: 输入所有目标 -->
             <div class="step active" id="step1">
-                <div class="step-title">第一步：倒出所有目标</div>
+                <div class="step-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <div class="step-title" style="margin-bottom: 0;">第一步：倒出所有目标</div>
+                    <button class="demo-btn" onclick="startDemo()" style="padding: 8px 16px; font-size: 13px;">▶ 看演示</button>
+                </div>
                 <div class="tip-box">
                     💡 提示：不要筛选，不要排序，把脑子里所有想做的事情都写下来。每按一次回车，就会变成一张卡片。写完点击"我写完了"。
                 </div>
@@ -971,14 +1235,33 @@
                     <span class="copy-success" id="copySuccess" style="display: none;">✓ 已复制</span>
                 </div>
 
-                <div style="text-align: center; margin-top: 15px;">
-                    <button class="btn restart-btn" onclick="restart()">重新开始</button>
+                <div style="text-align: center; margin-top: 15px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+                    <button class="btn restart-btn" onclick="goBackToSelect()">🔄 重新选择目标</button>
+                    <button class="btn restart-btn" onclick="restart()" style="background: #dc3545;">🗑️ 全部清空</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- 用户菜单 -->
+    <!-- 底部操作栏 -->
+    <div class="bottom-bar" id="bottomBar">
+        <div class="bottom-bar-content">
+            <div class="sync-status" id="syncStatus">
+                <span class="dot"></span>
+                <span id="syncText">本地模式</span>
+            </div>
+            <div class="bottom-actions">
+                <button class="bottom-btn" id="bottomLoginBtn" onclick="showLoginModal()">👤 登录</button>
+                <div id="bottomLoggedInActions" style="display: none; gap: 8px;">
+                    <button class="bottom-btn" onclick="syncToCloud()">☁️ 同步</button>
+                    <button class="bottom-btn" onclick="viewProfile()">👤 资料</button>
+                    <button class="bottom-btn danger" onclick="logout()">🚪 退出</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 用户菜单（保留作为备用） -->
     <div class="user-menu" id="userMenu">
         <div class="user-menu-item" onclick="syncToCloud()">
             <span>☁️</span>
@@ -1181,6 +1464,65 @@
                 oscillator.start(startTime);
                 oscillator.stop(startTime + 1.5);
             });
+        }
+
+        // 选择音效 - 清脆的确认音
+        function playSelectSound() {
+            initAudio();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+
+            oscillator.frequency.setValueAtTime(880, audioContext.currentTime); // A5
+            oscillator.frequency.exponentialRampToValueAtTime(1760, audioContext.currentTime + 0.1); // A6
+            oscillator.type = 'sine';
+
+            gainNode.gain.setValueAtTime(0.15, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.2);
+
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.2);
+        }
+
+        // 取消选择音效 - 低沉的取消音
+        function playDeselectSound() {
+            initAudio();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+
+            oscillator.frequency.setValueAtTime(440, audioContext.currentTime); // A4
+            oscillator.frequency.exponentialRampToValueAtTime(220, audioContext.currentTime + 0.1); // A3
+            oscillator.type = 'sine';
+
+            gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.15);
+
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.15);
+        }
+
+        // 错误/限制音效 - 提示音
+        function playErrorSound() {
+            initAudio();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+
+            oscillator.frequency.setValueAtTime(200, audioContext.currentTime);
+            oscillator.type = 'sawtooth';
+
+            gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.1);
+
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.1);
         }
 
         // 渲染目标卡片
@@ -1386,9 +1728,15 @@
             if (goal) {
                 const selectedCount = allGoalsList.filter(g => g.selected).length;
                 if (!goal.selected && selectedCount >= 5) {
+                    playErrorSound();
                     return;
                 }
                 goal.selected = !goal.selected;
+                if (goal.selected) {
+                    playSelectSound();
+                } else {
+                    playDeselectSound();
+                }
                 renderStep2List();
             }
         }
@@ -1442,9 +1790,15 @@
             if (goal) {
                 const selectedCount = top5Goals.filter(g => g.selected).length;
                 if (!goal.selected && selectedCount >= 3) {
+                    playErrorSound();
                     return;
                 }
                 goal.selected = !goal.selected;
+                if (goal.selected) {
+                    playSelectSound();
+                } else {
+                    playDeselectSound();
+                }
                 renderStep3List();
             }
         }
@@ -1482,7 +1836,7 @@
                 item.className = 'weight-item';
                 item.innerHTML = `
                     <div class="weight-label">${escapeHtml(goal.text)}</div>
-                    <input type="range" class="weight-slider" min="0" max="100" value="${weights[index]}"
+                    <input type="range" class="weight-slider" min="0" max="100" step="5" value="${weights[index]}"
                         oninput="updateWeight(${index}, this.value)">
                     <div style="text-align: center; margin-top: 5px; font-weight: bold; color: #667eea;">
                         ${weights[index]}%
@@ -1530,59 +1884,115 @@
             goToStep(5);
             updateProgress(100);
 
-            // 绘制Canvas
+            // 绘制Canvas - 9:16 比例，适合手机壁纸
             const canvas = document.getElementById('focusCard');
             const ctx = canvas.getContext('2d');
 
+            // 手机壁纸标准尺寸 1080x1920
             canvas.width = 1080;
             canvas.height = 1920;
 
+            // 安全区域（避开状态栏和底部导航）
+            const safeTop = 120;
+            const safeBottom = 180;
+
+            // 绘制渐变背景
             const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
             gradient.addColorStop(0, '#667eea');
-            gradient.addColorStop(1, '#764ba2');
+            gradient.addColorStop(0.5, '#764ba2');
+            gradient.addColorStop(1, '#f093fb');
             ctx.fillStyle = gradient;
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+            // 添加装饰性圆形
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.08)';
             ctx.beginPath();
-            ctx.arc(canvas.width * 0.8, canvas.height * 0.2, 300, 0, Math.PI * 2);
+            ctx.arc(canvas.width * 0.85, canvas.height * 0.15, 350, 0, Math.PI * 2);
             ctx.fill();
 
             ctx.beginPath();
-            ctx.arc(canvas.width * 0.2, canvas.height * 0.8, 200, 0, Math.PI * 2);
+            ctx.arc(canvas.width * 0.15, canvas.height * 0.85, 280, 0, Math.PI * 2);
             ctx.fill();
 
+            ctx.beginPath();
+            ctx.arc(canvas.width * 0.5, canvas.height * 0.5, 500, 0, Math.PI * 2);
+            ctx.fill();
+
+            // 顶部标题区域
             ctx.fillStyle = 'white';
-            ctx.font = 'bold 80px -apple-system, BlinkMacSystemFont, Arial, sans-serif';
+            ctx.font = 'bold 100px -apple-system, BlinkMacSystemFont, Arial, sans-serif';
             ctx.textAlign = 'center';
-            ctx.fillText('2026', canvas.width / 2, 200);
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.2)';
+            ctx.shadowBlur = 20;
+            ctx.shadowOffsetY = 10;
+            ctx.fillText('2026', canvas.width / 2, safeTop + 100);
 
-            ctx.font = 'bold 60px -apple-system, BlinkMacSystemFont, Arial, sans-serif';
-            ctx.fillText('这一年，只做三件事', canvas.width / 2, 300);
+            ctx.shadowColor = 'transparent';
+            ctx.font = '500 42px -apple-system, BlinkMacSystemFont, Arial, sans-serif';
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+            ctx.fillText('这一年，只做三件事', canvas.width / 2, safeTop + 170);
 
-            const startY = 500;
-            const gap = 400;
+            // 添加装饰线
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(canvas.width / 2 - 100, safeTop + 200);
+            ctx.lineTo(canvas.width / 2 + 100, safeTop + 200);
+            ctx.stroke();
+
+            // 计算卡片布局
+            const cardStartY = safeTop + 280;
+            const cardHeight = 380;
+            const cardGap = 40;
+            const cardMargin = 60;
 
             top3Goals.forEach((goal, index) => {
-                const y = startY + index * gap;
+                const y = cardStartY + index * (cardHeight + cardGap);
 
-                ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
+                // 绘制卡片阴影
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.15)';
                 ctx.beginPath();
-                ctx.roundRect(80, y, canvas.width - 160, 320, 20);
+                ctx.roundRect(cardMargin + 5, y + 5, canvas.width - cardMargin * 2, cardHeight, 25);
                 ctx.fill();
 
-                ctx.fillStyle = '#667eea';
-                ctx.font = 'bold 50px -apple-system, BlinkMacSystemFont, Arial, sans-serif';
-                ctx.textAlign = 'left';
-                ctx.fillText(`${weights[index]}%`, 120, y + 80);
+                // 绘制卡片背景
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.98)';
+                ctx.beginPath();
+                ctx.roundRect(cardMargin, y, canvas.width - cardMargin * 2, cardHeight, 25);
+                ctx.fill();
 
+                // 绘制权重标签（圆形背景）
+                const weightSize = 90;
+                const weightX = cardMargin + 50;
+                const weightY = y + 50;
+
+                // 权重圆形渐变背景
+                const weightGradient = ctx.createLinearGradient(weightX, weightY, weightX + weightSize, weightY + weightSize);
+                weightGradient.addColorStop(0, '#667eea');
+                weightGradient.addColorStop(1, '#764ba2');
+                ctx.fillStyle = weightGradient;
+                ctx.beginPath();
+                ctx.arc(weightX + weightSize/2, weightY + weightSize/2, weightSize/2, 0, Math.PI * 2);
+                ctx.fill();
+
+                // 权重文字
+                ctx.fillStyle = 'white';
+                ctx.font = 'bold 36px -apple-system, BlinkMacSystemFont, Arial, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(`${weights[index]}%`, weightX + weightSize/2, weightY + weightSize/2);
+
+                // 目标文字
                 ctx.fillStyle = '#333';
-                ctx.font = 'bold 48px -apple-system, BlinkMacSystemFont, Arial, sans-serif';
+                ctx.font = 'bold 44px -apple-system, BlinkMacSystemFont, Arial, sans-serif';
                 ctx.textAlign = 'left';
+                ctx.textBaseline = 'alphabetic';
 
+                const textX = weightX + weightSize + 35;
+                const textY = y + 90;
+                const maxWidth = canvas.width - cardMargin * 2 - textX - 30;
+                const lineHeight = 65;
                 const text = goal.text;
-                const maxWidth = canvas.width - 240;
-                const lineHeight = 70;
                 const words = text.split('');
                 let line = '';
                 let lineCount = 0;
@@ -1592,7 +2002,7 @@
                     const testLine = line + words[i];
                     const metrics = ctx.measureText(testLine);
                     if (metrics.width > maxWidth && line.length > 0) {
-                        ctx.fillText(line, 120, y + 160 + lineCount * lineHeight);
+                        ctx.fillText(line, textX, textY + lineCount * lineHeight);
                         line = words[i];
                         lineCount++;
                     } else {
@@ -1600,14 +2010,30 @@
                     }
                 }
                 if (line.length > 0 && lineCount < maxLines) {
-                    ctx.fillText(line, 120, y + 160 + lineCount * lineHeight);
+                    ctx.fillText(line, textX, textY + lineCount * lineHeight);
                 }
+
+                // 序号
+                ctx.fillStyle = 'rgba(102, 126, 234, 0.2)';
+                ctx.font = 'bold 120px -apple-system, BlinkMacSystemFont, Arial, sans-serif';
+                ctx.textAlign = 'right';
+                ctx.fillText(`${index + 1}`, canvas.width - cardMargin - 30, y + 130);
             });
 
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
-            ctx.font = '36px -apple-system, BlinkMacSystemFont, Arial, sans-serif';
+            // 底部标语
+            const bottomY = canvas.height - safeBottom - 80;
+
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+            ctx.font = 'italic 40px -apple-system, BlinkMacSystemFont, Arial, sans-serif';
             ctx.textAlign = 'center';
-            ctx.fillText('其他的，让它们去吧', canvas.width / 2, canvas.height - 100);
+            ctx.fillText('其他的，让它们去吧', canvas.width / 2, bottomY);
+
+            // 添加日期
+            const now = new Date();
+            const dateStr = `${now.getFullYear()}.${String(now.getMonth() + 1).padStart(2, '0')}.${String(now.getDate()).padStart(2, '0')}`;
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+            ctx.font = '28px -apple-system, BlinkMacSystemFont, Arial, sans-serif';
+            ctx.fillText(dateStr, canvas.width / 2, bottomY + 50);
 
             saveToStorage(5);
             loadStreakData();
@@ -1630,6 +2056,34 @@
                 localStorage.removeItem('focus2026_data');
                 localStorage.removeItem('focus2026_streak');
                 location.reload();
+            }
+        }
+
+        // 返回重新选择目标
+        function goBackToSelect() {
+            if (confirm('返回首页重新输入目标？当前所有进度将被重置。')) {
+                // 清空所有数据
+                allGoalsList = [];
+                top5Goals = [];
+                top3Goals = [];
+                weights = [0, 0, 0];
+
+                // 清空输入框
+                const textarea = document.getElementById('allGoals');
+                if (textarea) {
+                    textarea.value = '';
+                }
+
+                // 保存状态
+                saveToStorage(1);
+
+                // 返回 Step 1（首页）
+                goToStep(1);
+                updateProgress(20);
+                renderGoalCards();
+                updateGoalCount();
+
+                showToast('可以重新输入目标了', 'info');
             }
         }
 
@@ -1813,13 +2267,14 @@
         // 复制分享链接
         function copyShareLink() {
             const url = 'https://sangzhexianxian.github.io/focus/';
+            const shareText = `2026年，我只做3件事，其他的都放弃！这个工具帮我找到了真正重要的目标🔥\n\n${url}`;
 
             // 优先使用现代 API
             if (navigator.clipboard && navigator.clipboard.writeText) {
-                navigator.clipboard.writeText(url).then(() => {
+                navigator.clipboard.writeText(shareText).then(() => {
                     showCopySuccess();
                 }).catch(() => {
-                    fallbackCopy(url);
+                    fallbackCopy(shareText);
                 });
             } else {
                 fallbackCopy(shareText);
@@ -2086,22 +2541,31 @@
 
         // 更新用户UI
         function updateUserUI(isLoggedIn) {
-            const userAvatar = document.getElementById('userAvatar');
-            const loginBtn = document.getElementById('loginBtn');
             const syncStatus = document.getElementById('syncStatus');
             const syncText = document.getElementById('syncText');
+            const bottomLoginBtn = document.getElementById('bottomLoginBtn');
+            const bottomLoggedInActions = document.getElementById('bottomLoggedInActions');
 
             if (isLoggedIn && currentUser) {
-                userAvatar.style.display = 'flex';
-                userAvatar.textContent = currentUser.email.charAt(0).toUpperCase();
-                loginBtn.style.display = 'none';
                 syncStatus.classList.add('show', 'synced');
                 syncText.textContent = '已登录';
+                // 底部栏显示登录后的操作
+                if (bottomLoginBtn) {
+                    bottomLoginBtn.style.display = 'none';
+                }
+                if (bottomLoggedInActions) {
+                    bottomLoggedInActions.style.display = 'flex';
+                }
             } else {
-                userAvatar.style.display = 'none';
-                loginBtn.style.display = 'inline-block';
                 syncStatus.classList.remove('show', 'synced');
                 syncText.textContent = '本地模式';
+                // 底部栏显示登录按钮
+                if (bottomLoginBtn) {
+                    bottomLoginBtn.style.display = 'inline-block';
+                }
+                if (bottomLoggedInActions) {
+                    bottomLoggedInActions.style.display = 'none';
+                }
             }
         }
 
@@ -2266,6 +2730,12 @@
                 return;
             }
 
+            if (!supabaseClient) {
+                console.error('Supabase 客户端未初始化');
+                showToast('云服务未初始化，请刷新页面重试', 'error');
+                return;
+            }
+
             setSyncStatus('syncing');
             showToast('正在同步...', 'info');
 
@@ -2279,7 +2749,7 @@
                     weights: weights
                 };
 
-                const { data: existing, error: fetchError } = await supabase
+                const { data: existing, error: fetchError } = await supabaseClient
                     .from('user_focus_data')
                     .select('*')
                     .eq('user_id', currentUser.id)
@@ -2288,7 +2758,7 @@
                 const now = new Date().toISOString();
 
                 if (existing) {
-                    await supabase
+                    await supabaseClient
                         .from('user_focus_data')
                         .update({
                             focus_data: JSON.stringify(data),
@@ -2296,7 +2766,7 @@
                         })
                         .eq('user_id', currentUser.id);
                 } else {
-                    await supabase
+                    await supabaseClient
                         .from('user_focus_data')
                         .insert({
                             user_id: currentUser.id,
@@ -2310,8 +2780,10 @@
                 showToast('同步成功！', 'success');
             } catch (error) {
                 console.error('同步失败:', error);
+                console.error('错误详情:', error.message, error.code);
                 setSyncStatus('error');
-                showToast('同步失败，请检查网络', 'error');
+                const errorMsg = error.message || '同步失败，请检查网络';
+                showToast(`同步失败: ${errorMsg}`, 'error');
             }
         }
 
