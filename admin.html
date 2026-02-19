@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2026专注 - 后台管理系统</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f7fa;
+            color: #333;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            transition: transform 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .stat-card h3 {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .stat-card .value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stat-card .change {
+            font-size: 13px;
+            margin-top: 5px;
+        }
+
+        .stat-card .change.positive {
+            color: #28a745;
+        }
+
+        .stat-card .change.negative {
+            color: #dc3545;
+        }
+
+        .chart-section {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            margin-bottom: 30px;
+        }
+
+        .chart-section h2 {
+            font-size: 18px;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .data-table {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            margin-bottom: 30px;
+        }
+
+        .data-table h2 {
+            font-size: 18px;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            font-size: 13px;
+            color: #666;
+        }
+
+        td {
+            font-size: 14px;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .status-badge {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-badge.active {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-badge.inactive {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        .filter-bar {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .filter-bar input,
+        .filter-bar select {
+            padding: 8px 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            }
+
+            .container {
+                padding: 0 15px;
+            }
+
+            .data-table {
+                overflow-x: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📊 2026专注 - 后台管理系统</h1>
+        <p>数据概览与用户管理</p>
+    </div>
+
+    <div class="container">
+        <!-- 统计卡片 -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>总用户数</h3>
+                <div class="value" id="totalUsers">-</div>
+                <div class="change" id="usersChange">加载中...</div>
+            </div>
+            <div class="stat-card">
+                <h3>活跃用户（7天）</h3>
+                <div class="value" id="activeUsers">-</div>
+                <div class="change" id="activeChange">加载中...</div>
+            </div>
+            <div class="stat-card">
+                <h3>完成目标用户</h3>
+                <div class="value" id="completedUsers">-</div>
+                <div class="change positive" id="completedChange">加载中...</div>
+            </div>
+            <div class="stat-card">
+                <h3>平均完成时间</h3>
+                <div class="value" id="avgTime">-</div>
+                <div class="change" id="timeChange">加载中...</div>
+            </div>
+        </div>
+
+        <!-- 图表区域 -->
+        <div class="chart-section">
+            <h2>📈 用户增长趋势</h2>
+            <canvas id="userGrowthChart" height="300"></canvas>
+        </div>
+
+        <div class="chart-section">
+            <h2>🎯 目标完成情况</h2>
+            <canvas id="goalCompletionChart" height="300"></canvas>
+        </div>
+
+        <!-- 用户数据表格 -->
+        <div class="data-table">
+            <h2>👥 用户列表</h2>
+            <div class="filter-bar">
+                <input type="text" id="searchUser" placeholder="搜索用户邮箱...">
+                <select id="statusFilter">
+                    <option value="all">全部状态</option>
+                    <option value="active">已完成</option>
+                    <option value="incomplete">进行中</option>
+                </select>
+                <button class="btn btn-primary" onclick="loadUsers()">刷新数据</button>
+            </div>
+            <div id="usersContainer">
+                <div class="loading">加载数据中...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Supabase 配置
+        const SUPABASE_URL = 'https://klywwizwconvwjifzrcw.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable_65tNpTMzDgY8PFEQxIS-Eg_0tXESrkV';
+
+        // 初始化 Supabase
+        let supabase = null;
+        try {
+            if (window.supabase && window.supabase.createClient) {
+                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+                console.log('Supabase 初始化成功');
+            }
+        } catch (e) {
+            console.error('Supabase 初始化失败:', e);
+        }
+
+        // 存储数据
+        let allUsers = [];
+
+        // 页面加载
+        window.onload = async function() {
+            if (!supabase) {
+                alert('云服务未初始化');
+                return;
+            }
+
+            await loadAllData();
+        };
+
+        // 加载所有数据
+        async function loadAllData() {
+            try {
+                await loadStats();
+                await loadUsers();
+                await renderCharts();
+            } catch (error) {
+                console.error('加载数据失败:', error);
+            }
+        }
+
+        // 加载统计数据
+        async function loadStats() {
+            try {
+                // 获取所有用户数据
+                const { data: usersData, error: usersError } = await supabase
+                    .from('user_focus_data')
+                    .select('*');
+
+                if (usersError) throw usersError;
+
+                const total = usersData.length;
+                const completed = usersData.filter(u => {
+                    try {
+                        const data = JSON.parse(u.focus_data);
+                        return data.step >= 5;
+                    } catch {
+                        return false;
+                    }
+                }).length;
+
+                const active = usersData.filter(u => {
+                    try {
+                        const data = JSON.parse(u.focus_data);
+                        return data.step > 0 && data.step < 5;
+                    } catch {
+                        return false;
+                    }
+                }).length;
+
+                // 计算平均完成时间（基于创建时间到最近更新时间）
+                let totalTime = 0;
+                let count = 0;
+                usersData.forEach(u => {
+                    if (u.created_at && u.updated_at && u.created_at !== u.updated_at) {
+                        const diff = new Date(u.updated_at) - new Date(u.created_at);
+                        totalTime += diff;
+                        count++;
+                    }
+                });
+                const avgTime = count > 0 ? Math.round(totalTime / count / 1000 / 60) : 0; // 分钟
+
+                // 更新显示
+                document.getElementById('totalUsers').textContent = total;
+                document.getElementById('activeUsers').textContent = active;
+                document.getElementById('completedUsers').textContent = completed;
+                document.getElementById('avgTime').textContent = avgTime + ' 分钟';
+
+                document.getElementById('usersChange').textContent = '总注册用户';
+                document.getElementById('activeChange').textContent = '7天内活跃';
+                document.getElementById('completedChange').textContent = '已完成所有步骤';
+                document.getElementById('timeChange').textContent = '平均用时';
+
+                allUsers = usersData;
+            } catch (error) {
+                console.error('加载统计失败:', error);
+            }
+        }
+
+        // 加载用户列表
+        async function loadUsers() {
+            const container = document.getElementById('usersContainer');
+
+            try {
+                const searchTerm = document.getElementById('searchUser').value.toLowerCase();
+                const statusFilter = document.getElementById('statusFilter').value;
+
+                let filteredUsers = allUsers.filter(u => {
+                    // 状态过滤
+                    let status = 'incomplete';
+                    try {
+                        const data = JSON.parse(u.focus_data);
+                        if (data.step >= 5) status = 'active';
+                    } catch {}
+                    
+                    if (statusFilter !== 'all' && status !== statusFilter) return false;
+
+                    // 搜索过滤
+                    if (searchTerm && !u.user_id.toLowerCase().includes(searchTerm)) return false;
+
+                    return true;
+                });
+
+                if (filteredUsers.length === 0) {
+                    container.innerHTML = '<div class="empty-state">暂无数据</div>';
+                    return;
+                }
+
+                let html = `
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>用户 ID</th>
+                                <th>当前步骤</th>
+                                <th>目标数量</th>
+                                <th>创建时间</th>
+                                <th>更新时间</th>
+                                <th>状态</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+
+                filteredUsers.forEach(user => {
+                    let step = 0;
+                    let goalCount = 0;
+                    try {
+                        const data = JSON.parse(user.focus_data);
+                        step = data.step || 0;
+                        goalCount = (data.allGoalsList || []).length;
+                    } catch {}
+
+                    const stepNames = ['未开始', '输入目标', '选择5个', '选择3个', '分配权重', '完成'];
+                    const status = step >= 5 ? 'active' : 'incomplete';
+
+                    html += `
+                        <tr>
+                            <td>${user.user_id.substring(0, 16)}...</td>
+                            <td>${stepNames[Math.min(step, 5)]}</td>
+                            <td>${goalCount}</td>
+                            <td>${formatDate(user.created_at)}</td>
+                            <td>${formatDate(user.updated_at)}</td>
+                            <td><span class="status-badge ${status}">${step >= 5 ? '已完成' : '进行中'}</span></td>
+                        </tr>
+                    `;
+                });
+
+                html += '</tbody></table>';
+                container.innerHTML = html;
+            } catch (error) {
+                console.error('加载用户列表失败:', error);
+                container.innerHTML = '<div class="empty-state">加载失败</div>';
+            }
+        }
+
+        // 渲染图表
+        async function renderCharts() {
+            await renderUserGrowthChart();
+            await renderGoalCompletionChart();
+        }
+
+        // 用户增长图表
+        async function renderUserGrowthChart() {
+            const ctx = document.getElementById('userGrowthChart').getContext('2d');
+
+            // 按日期统计用户
+            const userDates = allUsers.map(u => u.created_at.split('T')[0]);
+            const dateCount = {};
+            userDates.forEach(date => {
+                dateCount[date] = (dateCount[date] || 0) + 1;
+            });
+
+            // 排序并获取最近30天
+            const sortedDates = Object.keys(dateCount).sort();
+            const recentDates = sortedDates.slice(-30);
+            const values = recentDates.map(d => dateCount[d]);
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: recentDates.map(d => d.substring(5)), // 只显示 月-日
+                    datasets: [{
+                        label: '新增用户',
+                        data: values,
+                        borderColor: '#667eea',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // 目标完成图表
+        async function renderGoalCompletionChart() {
+            const ctx = document.getElementById('goalCompletionChart').getContext('2d');
+
+            let stepCounts = [0, 0, 0, 0, 0, 0];
+            allUsers.forEach(u => {
+                try {
+                    const data = JSON.parse(u.focus_data);
+                    const step = Math.min(data.step || 0, 5);
+                    stepCounts[step]++;
+                } catch {}
+            });
+
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['未开始', '输入目标', '选择5个', '选择3个', '分配权重', '完成'],
+                    datasets: [{
+                        label: '用户数量',
+                        data: stepCounts,
+                        backgroundColor: [
+                            '#e0e0e0',
+                            '#667eea',
+                            '#764ba2',
+                            '#f093fb',
+                            '#ffc107',
+                            '#28a745'
+                        ],
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // 格式化日期
+        function formatDate(dateStr) {
+            const date = new Date(dateStr);
+            return date.toLocaleString('zh-CN', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+    </script>
+</body>
+</html>
