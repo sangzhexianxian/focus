@@ -1,0 +1,2147 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2026专注 - 只做三件事</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+        }
+
+        .user-info {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            border: 2px solid rgba(255,255,255,0.3);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .user-avatar:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .user-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 5px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            min-width: 180px;
+            overflow: hidden;
+            display: none;
+            z-index: 100;
+        }
+
+        .user-menu.show {
+            display: block;
+        }
+
+        .user-menu-item {
+            padding: 12px 16px;
+            font-size: 14px;
+            color: #333;
+            cursor: pointer;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .user-menu-item:hover {
+            background: #f0f0f0;
+        }
+
+        .user-menu-item.danger {
+            color: #dc3545;
+            border-top: 1px solid #eee;
+        }
+
+        /* 登录弹窗 */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .login-modal {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: modalSlideIn 0.3s ease-out;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .login-modal h2 {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: #667eea;
+            text-align: center;
+        }
+
+        .login-modal p {
+            font-size: 14px;
+            color: #666;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 15px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-bottom: 15px;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .login-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .toggle-auth {
+            text-align: center;
+            font-size: 14px;
+            color: #667eea;
+            cursor: pointer;
+            transition: opacity 0.3s;
+        }
+
+        .toggle-auth:hover {
+            opacity: 0.8;
+            text-decoration: underline;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: #999;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .close-modal:hover {
+            color: #333;
+        }
+
+        .sync-status {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            font-size: 12px;
+            color: rgba(255,255,255,0.8);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .sync-status .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #ccc;
+        }
+
+        .sync-status.synced .dot {
+            background: #28a745;
+        }
+
+        .sync-status.syncing .dot {
+            background: #ffc107;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 15px;
+        }
+
+        .demo-btn {
+            background: rgba(255,255,255,0.25);
+            color: white;
+            border: 2px solid rgba(255,255,255,0.6);
+            padding: 10px 24px;
+            border-radius: 25px;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        }
+
+        .demo-btn:hover {
+            background: rgba(255,255,255,0.35);
+            border-color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: #e0e0e0;
+            border-radius: 2px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.5s ease;
+            width: 0%;
+        }
+
+        .step {
+            display: none;
+        }
+
+        .step.active {
+            display: block;
+        }
+
+        .step-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #667eea;
+        }
+
+        .step-desc {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .tip-box {
+            background: linear-gradient(135deg, #667eea10 0%, #764ba210 100%);
+            border-left: 4px solid #667eea;
+            padding: 14px 18px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: #555;
+            line-height: 1.6;
+        }
+
+        .input-area {
+            margin-bottom: 20px;
+        }
+
+        textarea {
+            width: 100%;
+            height: 80px;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 14px;
+            resize: vertical;
+            transition: border-color 0.3s;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .goals-cards {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+            min-height: 60px;
+        }
+
+        .goal-card {
+            background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+            border: 2px solid #667eea;
+            border-radius: 25px;
+            padding: 10px 20px;
+            font-size: 14px;
+            color: #667eea;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            animation: cardAppear 0.4s ease-out;
+        }
+
+        .goal-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+            background: linear-gradient(135deg, #667eea25 0%, #764ba225 100%);
+        }
+
+        .goal-card.removing {
+            animation: cardDisappear 0.3s ease-out forwards;
+        }
+
+        .goal-card .icon {
+            font-size: 16px;
+        }
+
+        .goal-card .remove-btn {
+            opacity: 0;
+            margin-left: 5px;
+            cursor: pointer;
+            transition: opacity 0.2s;
+            color: #dc3545;
+            font-weight: bold;
+        }
+
+        .goal-card:hover .remove-btn {
+            opacity: 1;
+        }
+
+        @keyframes cardAppear {
+            from {
+                opacity: 0;
+                transform: scale(0.8) translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        @keyframes cardDisappear {
+            from {
+                opacity: 1;
+                transform: scale(1);
+            }
+            to {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 30px;
+            color: #999;
+            font-size: 14px;
+        }
+
+        .empty-state .icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Toast 提示 */
+        .toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            background: white;
+            padding: 16px 28px;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            z-index: 1000;
+            transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 15px;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .toast-icon {
+            font-size: 20px;
+        }
+
+        .toast.success .toast-icon { color: #28a745; }
+        .toast.success { border-left: 4px solid #28a745; }
+        .toast.error .toast-icon { color: #dc3545; }
+        .toast.error { border-left: 4px solid #dc3545; }
+        .toast.info .toast-icon { color: #667eea; }
+        .toast.info { border-left: 4px solid #667eea; }
+
+        /* 快捷按钮提示 */
+        .quick-tip {
+            text-align: center;
+            font-size: 13px;
+            color: #999;
+            margin-top: 10px;
+        }
+
+        .goals-list {
+            margin-bottom: 20px;
+        }
+
+        .goal-item {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 2px solid transparent;
+        }
+
+        .goal-item:hover {
+            background: #e9ecef;
+        }
+
+        .goal-item.selected {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+
+        .goal-item .checkbox {
+            width: 24px;
+            height: 24px;
+            border: 2px solid #ccc;
+            border-radius: 50%;
+            margin-right: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .goal-item.selected .checkbox {
+            background: #667eea;
+            border-color: #667eea;
+        }
+
+        .goal-item.selected .checkbox::after {
+            content: '✓';
+            color: white;
+            font-size: 14px;
+        }
+
+        .goal-item .text {
+            flex: 1;
+            font-size: 14px;
+        }
+
+        .weight-section {
+            margin-bottom: 20px;
+        }
+
+        .weight-item {
+            margin-bottom: 15px;
+        }
+
+        .weight-label {
+            font-size: 14px;
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        .weight-input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .weight-slider {
+            width: 100%;
+            margin-top: 8px;
+        }
+
+        .weight-total {
+            text-align: center;
+            padding: 15px;
+            background: #f0f4ff;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .weight-total.valid {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .weight-total.invalid {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .card-preview {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .card-preview canvas {
+            max-width: 100%;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .download-btn {
+            background: #28a745;
+        }
+
+        .download-btn:hover {
+            background: #218838;
+            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
+        }
+
+        .restart-btn {
+            background: #6c757d;
+            margin-left: 10px;
+        }
+
+        .restart-btn:hover {
+            background: #5a6268;
+            box-shadow: 0 5px 15px rgba(108, 117, 125, 0.4);
+        }
+
+        .selection-count {
+            text-align: center;
+            font-size: 14px;
+            color: #667eea;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .error-message {
+            color: #dc3545;
+            font-size: 14px;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .share-section {
+            text-align: center;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .share-section h4 {
+            margin-bottom: 10px;
+            color: #667eea;
+        }
+
+        .share-section p {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+        .copy-link-btn {
+            background: #6c757d;
+            font-size: 14px;
+            padding: 10px 20px;
+        }
+
+        .copy-link-btn:hover {
+            background: #5a6268;
+        }
+
+        .copy-success {
+            color: #28a745;
+            font-size: 13px;
+            margin-left: 10px;
+        }
+
+        .daily-checkin {
+            text-align: center;
+            padding: 15px;
+            background: #d4edda;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .daily-checkin h4 {
+            margin-bottom: 8px;
+            color: #155724;
+        }
+
+        .daily-checkin p {
+            font-size: 13px;
+            color: #155724;
+            margin-bottom: 10px;
+        }
+
+        .streak-count {
+            font-size: 24px;
+            font-weight: bold;
+            color: #28a745;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                border-radius: 0;
+                min-height: 100vh;
+            }
+
+            .content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="sync-status" id="syncStatus">
+                <span class="dot"></span>
+                <span id="syncText">本地模式</span>
+            </div>
+            <div class="user-info">
+                <button class="demo-btn" onclick="startDemo()">▶ 演示</button>
+                <div class="user-avatar" id="userAvatar" onclick="toggleUserMenu()" style="display: none;">👤</div>
+                <button class="demo-btn" id="loginBtn" onclick="showLoginModal()">登录</button>
+            </div>
+            <h1>2026专注</h1>
+            <p>这一年，只做三件事</p>
+        </div>
+
+        <div class="content">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+
+            <!-- Step 1: 输入所有目标 -->
+            <div class="step active" id="step1">
+                <div class="step-title">第一步：倒出所有目标</div>
+                <div class="tip-box">
+                    💡 提示：不要筛选，不要排序，把脑子里所有想做的事情都写下来。每按一次回车，就会变成一张卡片。写完点击"我写完了"。
+                </div>
+                <div class="step-desc">
+                    把你2026年想做的所有事情都写下来，不限数量，不用排序。让大脑清空。
+                </div>
+                <div class="input-area">
+                    <textarea id="allGoals" placeholder="在这里输入你的目标，按回车键确认..." onkeydown="handleInputKeydown(event)"></textarea>
+                </div>
+                <div class="goals-cards" id="goalsCards">
+                    <div class="empty-state">
+                        <span class="icon">✨</span>
+                        在上面输入框中写下你的第一个目标
+                    </div>
+                </div>
+                <div style="text-align: center; margin-bottom: 20px; color: #999; font-size: 13px;">
+                    已记录 <span id="goalCount" style="color: #667eea; font-weight: bold;">0</span> 个目标
+                    <div class="quick-tip">按 Enter 键快速添加</div>
+                </div>
+                <div style="text-align: center;">
+                    <button class="btn" onclick="goToStep2()">我写完了，下一步</button>
+                </div>
+            </div>
+
+            <!-- Step 2: 选出5个 -->
+            <div class="step" id="step2">
+                <div class="step-title">第二步：选出最重要的5个</div>
+                <div class="tip-box">
+                    💡 提示：问自己一个问题：如果2026年只能完成5件事，我会选哪5个？
+                </div>
+                <div class="step-desc">
+                    从你刚才列出的目标中，选出5个"看起来很重要"的。这是第一轮筛选。
+                </div>
+                <div class="selection-count" id="step2Count">已选择 0/5</div>
+                <div class="goals-list" id="step2List"></div>
+                <div class="error-message" id="step2Error"></div>
+                <button class="btn" onclick="goToStep3()">下一步</button>
+            </div>
+
+            <!-- Step 3: 选出3个 -->
+            <div class="step" id="step3">
+                <div class="step-title">第三步：最终选出3个</div>
+                <div class="tip-box">
+                    💡 提示：这可能是最痛苦的一步。问自己：哪3个目标实现后，会让2026年无憾？
+                </div>
+                <div class="step-desc">
+                    从这5个目标中，只保留3个。这是残酷但必要的一步，其他的只能放弃。
+                </div>
+                <div class="selection-count" id="step3Count">已选择 0/3</div>
+                <div class="goals-list" id="step3List"></div>
+                <div class="error-message" id="step3Error"></div>
+                <button class="btn" onclick="goToStep4()">下一步</button>
+            </div>
+
+            <!-- Step 4: 分配权重 -->
+            <div class="step" id="step4">
+                <div class="step-title">第四步：分配权重</div>
+                <div class="tip-box">
+                    💡 提示：权重代表你的精力分配。50%的目标要投入一半的时间和注意力。
+                </div>
+                <div class="step-desc">
+                    给这3个目标分配权重，总和必须是100%。
+                </div>
+                <div class="weight-section" id="weightSection"></div>
+                <div class="weight-total" id="weightTotal">
+                    当前总和：0%
+                </div>
+                <div class="error-message" id="step4Error"></div>
+                <button class="btn" onclick="generateCard()">生成专注卡</button>
+            </div>
+
+            <!-- Step 5: 生成专注卡 -->
+            <div class="step" id="step5">
+                <div class="step-title">你的2026专注卡</div>
+                <div class="step-desc">
+                    把这张卡保存为手机壁纸，每天提醒自己：只做这三件事。
+                </div>
+                <div class="card-preview">
+                    <canvas id="focusCard"></canvas>
+                </div>
+                <div style="text-align: center;">
+                    <button class="btn download-btn" onclick="downloadCard()">下载专注卡</button>
+                </div>
+
+                <div class="daily-checkin" id="dailyCheckin">
+                    <h4>🔥 已连续专注 <span class="streak-count" id="streakCount">0</span> 天</h4>
+                    <p>每天回来打卡，保持专注惯性</p>
+                    <button class="btn" onclick="dailyCheckin()" id="checkinBtn">今日打卡</button>
+                </div>
+
+                <div style="text-align: center; margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 10px; font-size: 13px; color: #666;">
+                    <p style="margin-bottom: 8px;">💡 小提示：把这张专注卡设为手机壁纸</p>
+                    <p>每天睁开眼就能看到，时刻提醒自己</p>
+                </div>
+
+                <div class="share-section">
+                    <h4>📤 分享给你的朋友</h4>
+                    <p>让更多人用减法思维规划2026</p>
+                    <button class="btn copy-link-btn" onclick="copyShareLink()">复制链接</button>
+                    <span class="copy-success" id="copySuccess" style="display: none;">✓ 已复制</span>
+                </div>
+
+                <div style="text-align: center; margin-top: 15px;">
+                    <button class="btn restart-btn" onclick="restart()">重新开始</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 用户菜单 -->
+    <div class="user-menu" id="userMenu">
+        <div class="user-menu-item" onclick="syncToCloud()">
+            <span>☁️</span>
+            <span id="syncMenuItem">立即同步</span>
+        </div>
+        <div class="user-menu-item" onclick="viewProfile()">
+            <span>👤</span>
+            <span>个人资料</span>
+        </div>
+        <div class="user-menu-item danger" onclick="logout()">
+            <span>🚪</span>
+            <span>退出登录</span>
+        </div>
+    </div>
+
+    <!-- 登录弹窗 -->
+    <div class="modal-overlay" id="loginModal">
+        <div class="login-modal" style="position: relative;">
+            <button class="close-modal" onclick="hideLoginModal()">×</button>
+
+            <!-- 登录表单 -->
+            <div id="loginForm">
+                <h2>欢迎回来</h2>
+                <p>登录后自动同步你的专注目标</p>
+                <div class="form-group">
+                    <label>邮箱</label>
+                    <input type="email" id="loginEmail" placeholder="your@email.com">
+                </div>
+                <div class="form-group">
+                    <label>密码</label>
+                    <input type="password" id="loginPassword" placeholder="••••••••">
+                </div>
+                <button class="login-btn" onclick="handleLogin()" id="loginSubmitBtn">登录</button>
+                <div class="toggle-auth" onclick="showRegisterForm()">没有账号？立即注册</div>
+            </div>
+
+            <!-- 注册表单 -->
+            <div id="registerForm" style="display: none;">
+                <h2>创建账号</h2>
+                <p>注册后自动云端保存你的专注目标</p>
+                <div class="form-group">
+                    <label>邮箱</label>
+                    <input type="email" id="registerEmail" placeholder="your@email.com">
+                </div>
+                <div class="form-group">
+                    <label>密码（至少6位）</label>
+                    <input type="password" id="registerPassword" placeholder="••••••••">
+                </div>
+                <div class="form-group">
+                    <label>确认密码</label>
+                    <input type="password" id="registerConfirmPassword" placeholder="••••••••">
+                </div>
+                <button class="login-btn" onclick="handleRegister()" id="registerSubmitBtn">注册</button>
+                <div class="toggle-auth" onclick="showLoginForm()">已有账号？去登录</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast 容器 -->
+    <div class="toast" id="toast">
+        <span class="toast-icon" id="toastIcon">✓</span>
+        <span id="toastMessage">操作成功</span>
+    </div>
+
+    <script>
+        // Supabase 配置
+        const SUPABASE_URL = 'https://klywwizwconvwjifzrcw.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable_65tNpTMzDgY8PFEQxIS-Eg_0tXESrkV';
+
+        // 初始化 Supabase
+        let supabase = null;
+        try {
+            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        } catch (e) {
+            console.log('Supabase 初始化失败，将使用本地存储');
+        }
+
+        // 数据存储
+        let allGoalsList = [];
+        let top5Goals = [];
+        let top3Goals = [];
+        let weights = [0, 0, 0];
+        let isDemoRunning = false;
+        let audioContext = null;
+        let currentUser = null;
+        let isCloudMode = false;
+
+        // ===== 音效系统 =====
+        function initAudio() {
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioContext.state === 'suspended') {
+                audioContext.resume();
+            }
+        }
+
+        // 打字音效 - 清脆的气泡声
+        function playTypingSound() {
+            initAudio();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+
+            oscillator.frequency.setValueAtTime(800 + Math.random() * 200, audioContext.currentTime);
+            oscillator.type = 'sine';
+
+            gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.1);
+
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.1);
+        }
+
+        // 卡片出现音效 - 柔和的确认声
+        function playCardSound() {
+            initAudio();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+
+            oscillator.frequency.setValueAtTime(523.25, audioContext.currentTime); // C5
+            oscillator.frequency.exponentialRampToValueAtTime(783.99, audioContext.currentTime + 0.1); // G5
+            oscillator.type = 'sine';
+
+            gainNode.gain.setValueAtTime(0.15, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.3);
+
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.3);
+        }
+
+        // 释放音效 - 舒缓的和弦
+        function playReleaseSound() {
+            initAudio();
+            const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+
+            notes.forEach((freq, index) => {
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+
+                oscillator.frequency.setValueAtTime(freq, audioContext.currentTime + index * 0.05);
+                oscillator.type = 'sine';
+
+                const startTime = audioContext.currentTime + index * 0.05;
+                gainNode.gain.setValueAtTime(0, startTime);
+                gainNode.gain.linearRampToValueAtTime(0.1, startTime + 0.1);
+                gainNode.gain.exponentialRampToValueAtTime(0.001, startTime + 1.5);
+
+                oscillator.start(startTime);
+                oscillator.stop(startTime + 1.5);
+            });
+        }
+
+        // 处理输入框按键
+        function handleInputKeydown(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                const textarea = document.getElementById('allGoals');
+                const text = textarea.value.trim();
+
+                if (text.length > 0) {
+                    addGoalCard(text);
+                    textarea.value = '';
+                    textarea.focus();
+                }
+            }
+        }
+
+        // 添加目标卡片
+        function addGoalCard(text) {
+            playCardSound();
+
+            const icons = ['🎯', '💪', '📚', '🏃', '💼', '🚀', '✨', '🌟', '🔥', '💎'];
+            const randomIcon = icons[Math.floor(Math.random() * icons.length)];
+
+            const goal = {
+                id: Date.now() + Math.random(),
+                text: text,
+                icon: randomIcon,
+                selected: false
+            };
+
+            allGoalsList.push(goal);
+            renderGoalCards();
+            updateGoalCount();
+        }
+
+        // 渲染目标卡片
+        function renderGoalCards() {
+            const container = document.getElementById('goalsCards');
+
+            if (allGoalsList.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <span class="icon">✨</span>
+                        在上面输入框中写下你的第一个目标
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = '';
+
+            allGoalsList.forEach((goal, index) => {
+                const card = document.createElement('div');
+                card.className = 'goal-card';
+                card.style.animationDelay = `${index * 0.05}s`;
+                card.innerHTML = `
+                    <span class="icon">${goal.icon}</span>
+                    <span class="text">${escapeHtml(goal.text)}</span>
+                    <span class="remove-btn" onclick="removeGoalCard(${index})">✕</span>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // 删除目标卡片
+        function removeGoalCard(index) {
+            const cards = document.querySelectorAll('.goal-card');
+            if (cards[index]) {
+                cards[index].classList.add('removing');
+                setTimeout(() => {
+                    allGoalsList.splice(index, 1);
+                    renderGoalCards();
+                    updateGoalCount();
+                }, 300);
+            }
+        }
+
+        // 更新目标计数
+        function updateGoalCount() {
+            document.getElementById('goalCount').textContent = allGoalsList.length;
+        }
+        function loadFromStorage() {
+            const saved = localStorage.getItem('focus2026_data');
+            if (saved) {
+                const data = JSON.parse(saved);
+                if (data.step) {
+                    allGoalsList = data.allGoalsList || [];
+                    top5Goals = data.top5Goals || [];
+                    top3Goals = data.top3Goals || [];
+                    weights = data.weights || [0, 0, 0];
+
+                    // 恢复到对应步骤
+                    if (data.step >= 1) {
+                        goToStep(1);
+                        updateProgress(20);
+                        renderGoalCards();
+                        updateGoalCount();
+                    }
+                    if (data.step >= 2) {
+                        goToStep(2);
+                        updateProgress(40);
+                        renderStep2List();
+                    }
+                    if (data.step >= 3) {
+                        goToStep(3);
+                        updateProgress(60);
+                        renderStep3List();
+                    }
+                    if (data.step >= 4) {
+                        goToStep(4);
+                        updateProgress(80);
+                        renderWeightSection();
+                    }
+                    if (data.step >= 5) {
+                        goToStep(5);
+                        updateProgress(100);
+                        generateCard();
+                        loadStreakData();
+                    }
+                }
+            } else {
+                updateProgress(20);
+            }
+        }
+
+        // 保存到本地存储
+        function saveToStorage(step) {
+            const data = {
+                step: step,
+                allGoalsList: allGoalsList,
+                top5Goals: top5Goals,
+                top3Goals: top3Goals,
+                weights: weights
+            };
+            localStorage.setItem('focus2026_data', JSON.stringify(data));
+        }
+
+        // 更新进度条
+        function updateProgress(percent) {
+            document.getElementById('progressFill').style.width = percent + '%';
+        }
+
+        // 切换步骤
+        function goToStep(stepNum) {
+            document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+            document.getElementById('step' + stepNum).classList.add('active');
+        }
+
+        // Toast 提示函数
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const icon = document.getElementById('toastIcon');
+            const msg = document.getElementById('toastMessage');
+
+            toast.className = 'toast ' + type;
+            msg.textContent = message;
+
+            if (type === 'success') icon.textContent = '✓';
+            else if (type === 'error') icon.textContent = '✕';
+            else icon.textContent = 'ℹ';
+
+            toast.classList.add('show');
+
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Step 1 -> Step 2
+        function goToStep2() {
+            if (allGoalsList.length === 0) {
+                showToast('请至少输入一个目标', 'error');
+                return;
+            }
+
+            playReleaseSound();
+
+            saveToStorage(1);
+            goToStep(2);
+            updateProgress(40);
+            renderStep2List();
+
+            // 如果是演示模式，继续后续步骤
+            if (isDemoRunning && window.demoStep2) {
+                window.demoStep2();
+            }
+        }
+
+        // 渲染Step 2列表
+        function renderStep2List() {
+            const container = document.getElementById('step2List');
+            container.innerHTML = '';
+
+            allGoalsList.forEach(goal => {
+                const item = document.createElement('div');
+                item.className = 'goal-item' + (goal.selected ? ' selected' : '');
+                item.onclick = () => toggleStep2Goal(goal.id);
+                item.innerHTML = `
+                    <div class="checkbox"></div>
+                    <div class="text">${escapeHtml(goal.text)}</div>
+                `;
+                container.appendChild(item);
+            });
+
+            updateStep2Count();
+        }
+
+        // 切换Step 2选中状态
+        function toggleStep2Goal(id) {
+            if (isDemoRunning) return;
+
+            const goal = allGoalsList.find(g => g.id === id);
+            if (goal) {
+                const selectedCount = allGoalsList.filter(g => g.selected).length;
+                if (!goal.selected && selectedCount >= 5) {
+                    return;
+                }
+                goal.selected = !goal.selected;
+                renderStep2List();
+            }
+        }
+
+        // 更新Step 2选择计数
+        function updateStep2Count() {
+            const count = allGoalsList.filter(g => g.selected).length;
+            document.getElementById('step2Count').textContent = `已选择 ${count}/5`;
+        }
+
+        // Step 2 -> Step 3
+        function goToStep3() {
+            const selected = allGoalsList.filter(g => g.selected);
+            if (selected.length !== 5) {
+                document.getElementById('step2Error').textContent = '请正好选择5个目标';
+                return;
+            }
+            document.getElementById('step2Error').textContent = '';
+
+            top5Goals = selected.map(g => ({ ...g, selected: false }));
+            saveToStorage(2);
+            goToStep(3);
+            updateProgress(60);
+            renderStep3List();
+        }
+
+        // 渲染Step 3列表
+        function renderStep3List() {
+            const container = document.getElementById('step3List');
+            container.innerHTML = '';
+
+            top5Goals.forEach(goal => {
+                const item = document.createElement('div');
+                item.className = 'goal-item' + (goal.selected ? ' selected' : '');
+                item.onclick = () => toggleStep3Goal(goal.id);
+                item.innerHTML = `
+                    <div class="checkbox"></div>
+                    <div class="text">${escapeHtml(goal.text)}</div>
+                `;
+                container.appendChild(item);
+            });
+
+            updateStep3Count();
+        }
+
+        // 切换Step 3选中状态
+        function toggleStep3Goal(id) {
+            if (isDemoRunning) return;
+
+            const goal = top5Goals.find(g => g.id === id);
+            if (goal) {
+                const selectedCount = top5Goals.filter(g => g.selected).length;
+                if (!goal.selected && selectedCount >= 3) {
+                    return;
+                }
+                goal.selected = !goal.selected;
+                renderStep3List();
+            }
+        }
+
+        // 更新Step 3选择计数
+        function updateStep3Count() {
+            const count = top5Goals.filter(g => g.selected).length;
+            document.getElementById('step3Count').textContent = `已选择 ${count}/3`;
+        }
+
+        // Step 3 -> Step 4
+        function goToStep4() {
+            const selected = top5Goals.filter(g => g.selected);
+            if (selected.length !== 3) {
+                document.getElementById('step3Error').textContent = '请正好选择3个目标';
+                return;
+            }
+            document.getElementById('step3Error').textContent = '';
+
+            top3Goals = selected.map((g, index) => ({ ...g, weight: 0 }));
+            weights = [0, 0, 0];
+            saveToStorage(3);
+            goToStep(4);
+            updateProgress(80);
+            renderWeightSection();
+        }
+
+        // 渲染权重分配区域
+        function renderWeightSection() {
+            const container = document.getElementById('weightSection');
+            container.innerHTML = '';
+
+            top3Goals.forEach((goal, index) => {
+                const item = document.createElement('div');
+                item.className = 'weight-item';
+                item.innerHTML = `
+                    <div class="weight-label">${escapeHtml(goal.text)}</div>
+                    <input type="range" class="weight-slider" min="0" max="100" value="${weights[index]}"
+                        oninput="updateWeight(${index}, this.value)">
+                    <div style="text-align: center; margin-top: 5px; font-weight: bold; color: #667eea;">
+                        ${weights[index]}%
+                    </div>
+                `;
+                container.appendChild(item);
+            });
+
+            updateWeightTotal();
+        }
+
+        // 更新权重
+        function updateWeight(index, value) {
+            if (isDemoRunning) return;
+
+            weights[index] = parseInt(value);
+            renderWeightSection();
+            updateWeightTotal();
+        }
+
+        // 更新权重总和显示
+        function updateWeightTotal() {
+            const total = weights.reduce((a, b) => a + b, 0);
+            const totalEl = document.getElementById('weightTotal');
+            totalEl.textContent = `当前总和：${total}%`;
+
+            if (total === 100) {
+                totalEl.className = 'weight-total valid';
+                document.getElementById('step4Error').textContent = '';
+            } else {
+                totalEl.className = 'weight-total invalid';
+                document.getElementById('step4Error').textContent = '权重总和必须是100%';
+            }
+        }
+
+        // Step 4 -> Step 5: 生成专注卡
+        function generateCard() {
+            const total = weights.reduce((a, b) => a + b, 0);
+            if (total !== 100) {
+                showToast('权重总和必须是100%', 'error');
+                return;
+            }
+
+            saveToStorage(4);
+            goToStep(5);
+            updateProgress(100);
+
+            // 绘制Canvas
+            const canvas = document.getElementById('focusCard');
+            const ctx = canvas.getContext('2d');
+
+            canvas.width = 1080;
+            canvas.height = 1920;
+
+            const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+            gradient.addColorStop(0, '#667eea');
+            gradient.addColorStop(1, '#764ba2');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+            ctx.beginPath();
+            ctx.arc(canvas.width * 0.8, canvas.height * 0.2, 300, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.beginPath();
+            ctx.arc(canvas.width * 0.2, canvas.height * 0.8, 200, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = 'white';
+            ctx.font = 'bold 80px -apple-system, BlinkMacSystemFont, Arial, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('2026', canvas.width / 2, 200);
+
+            ctx.font = 'bold 60px -apple-system, BlinkMacSystemFont, Arial, sans-serif';
+            ctx.fillText('这一年，只做三件事', canvas.width / 2, 300);
+
+            const startY = 500;
+            const gap = 400;
+
+            top3Goals.forEach((goal, index) => {
+                const y = startY + index * gap;
+
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
+                ctx.beginPath();
+                ctx.roundRect(80, y, canvas.width - 160, 320, 20);
+                ctx.fill();
+
+                ctx.fillStyle = '#667eea';
+                ctx.font = 'bold 50px -apple-system, BlinkMacSystemFont, Arial, sans-serif';
+                ctx.textAlign = 'left';
+                ctx.fillText(`${weights[index]}%`, 120, y + 80);
+
+                ctx.fillStyle = '#333';
+                ctx.font = 'bold 48px -apple-system, BlinkMacSystemFont, Arial, sans-serif';
+                ctx.textAlign = 'left';
+
+                const text = goal.text;
+                const maxWidth = canvas.width - 240;
+                const lineHeight = 70;
+                const words = text.split('');
+                let line = '';
+                let lineCount = 0;
+                const maxLines = 3;
+
+                for (let i = 0; i < words.length && lineCount < maxLines; i++) {
+                    const testLine = line + words[i];
+                    const metrics = ctx.measureText(testLine);
+                    if (metrics.width > maxWidth && line.length > 0) {
+                        ctx.fillText(line, 120, y + 160 + lineCount * lineHeight);
+                        line = words[i];
+                        lineCount++;
+                    } else {
+                        line = testLine;
+                    }
+                }
+                if (line.length > 0 && lineCount < maxLines) {
+                    ctx.fillText(line, 120, y + 160 + lineCount * lineHeight);
+                }
+            });
+
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+            ctx.font = '36px -apple-system, BlinkMacSystemFont, Arial, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('其他的，让它们去吧', canvas.width / 2, canvas.height - 100);
+
+            saveToStorage(5);
+            loadStreakData();
+        }
+
+        // 下载专注卡
+        function downloadCard() {
+            const canvas = document.getElementById('focusCard');
+            const link = document.createElement('a');
+            link.download = '2026专注卡.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+
+            showToast('专注卡已下载，设为壁纸吧！', 'success');
+        }
+
+        // 重新开始
+        function restart() {
+            if (confirm('确定要重新开始吗？当前进度将被清除。')) {
+                localStorage.removeItem('focus2026_data');
+                localStorage.removeItem('focus2026_streak');
+                location.reload();
+            }
+        }
+
+        // HTML转义
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // ===== 演示模式 =====
+        function startDemo() {
+            isDemoRunning = true;
+            localStorage.removeItem('focus2026_data');
+            localStorage.removeItem('focus2026_streak');
+            allGoalsList = [];
+            top5Goals = [];
+            top3Goals = [];
+
+            const demoGoals = [
+                '孩子中考考上好高中',
+                '阅读52本书',
+                '跑完1000公里保持健康',
+                '用AI创业',
+                '做内容创业',
+                '学习Python编程',
+                '每周写3篇文章',
+                '学会钢琴基础'
+            ];
+
+            // Step 1: 清空并回到第一步
+            goToStep(1);
+            updateProgress(20);
+            document.getElementById('allGoals').value = '';
+            renderGoalCards();
+            updateGoalCount();
+
+            // 逐个添加目标卡片
+            let goalIndex = 0;
+            function addNextGoal() {
+                if (goalIndex < demoGoals.length) {
+                    const textarea = document.getElementById('allGoals');
+                    textarea.value = demoGoals[goalIndex];
+                    addGoalCard(demoGoals[goalIndex]);
+                    textarea.value = '';
+                    goalIndex++;
+                    setTimeout(addNextGoal, 400); // 每0.4秒添加一个
+                } else {
+                    // 所有目标添加完成，进入下一步
+                    setTimeout(() => {
+                        playReleaseSound();
+                        goToStep2();
+                    }, 500);
+                }
+            }
+
+            setTimeout(addNextGoal, 500); // 开始添加目标
+
+            // 重新定义 Step 2-5 的演示逻辑（在 addNextGoal 完成后执行）
+            window.demoStep2 = function() {
+                allGoalsList = demoGoals.map((text, i) => ({
+                    id: i,
+                    text,
+                    icon: ['🎯', '💪', '📚', '🏃', '💼', '🚀', '✨', '🌟'][i % 8],
+                    selected: false
+                }));
+                renderStep2List();
+
+                // Step 2: 选5个
+                setTimeout(() => {
+                    const toSelect = [0, 1, 2, 3, 4];
+                    toSelect.forEach((id, idx) => {
+                        setTimeout(() => {
+                            allGoalsList[id].selected = true;
+                            renderStep2List();
+                        }, idx * 300);
+                    });
+
+                    setTimeout(() => {
+                        goToStep3();
+                        top5Goals = allGoalsList.filter(g => g.selected).map(g => ({ ...g, selected: false }));
+                        renderStep3List();
+
+                        // Step 3: 选3个
+                        setTimeout(() => {
+                            const toSelect3 = [0, 1, 2];
+                            toSelect3.forEach((relativeId, idx) => {
+                                setTimeout(() => {
+                                    top5Goals[relativeId].selected = true;
+                                    renderStep3List();
+                                }, idx * 300);
+                            });
+
+                            setTimeout(() => {
+                                goToStep4();
+                                top3Goals = top5Goals.filter(g => g.selected).map((g, i) => ({ ...g, weight: 0 }));
+                                renderWeightSection();
+
+                                // Step 4: 分配权重
+                                setTimeout(() => {
+                                    weights = [50, 30, 20];
+                                    renderWeightSection();
+                                    updateWeightTotal();
+
+                                    setTimeout(() => {
+                                        generateCard();
+
+                                    setTimeout(() => {
+                                        isDemoRunning = false;
+                                        localStorage.removeItem('focus2026_data');
+                                        localStorage.removeItem('focus2026_streak');
+                                        showToast('演示完成！现在轮到你了', 'success');
+                                    }, 2000);
+                                    }, 1000);
+                                }, 1000);
+                            }, 1500);
+                        }, 2000);
+                    }, 2000);
+                }, 1500);
+            };
+        }
+
+        // ===== 用户留存功能 =====
+
+        // 加载打卡数据
+        function loadStreakData() {
+            const streakData = JSON.parse(localStorage.getItem('focus2026_streak') || '{"streak": 0, "lastDate": null}');
+            const today = new Date().toDateString();
+            const lastDate = streakData.lastDate;
+
+            // 检查是否连续
+            if (lastDate) {
+                const last = new Date(lastDate);
+                const now = new Date(today);
+                const diffDays = Math.floor((now - last) / (1000 * 60 * 60 * 24));
+
+                if (diffDays > 1) {
+                    // 断了，重置
+                    streakData.streak = 0;
+                }
+            }
+
+            document.getElementById('streakCount').textContent = streakData.streak;
+
+            // 检查今天是否已打卡
+            if (lastDate === today) {
+                document.getElementById('checkinBtn').disabled = true;
+                document.getElementById('checkinBtn').textContent = '✓ 已打卡';
+            }
+        }
+
+        // 每日打卡
+        function dailyCheckin() {
+            const streakData = JSON.parse(localStorage.getItem('focus2026_streak') || '{"streak": 0, "lastDate": null}');
+            const today = new Date().toDateString();
+
+            if (streakData.lastDate === today) {
+                return;
+            }
+
+            streakData.streak++;
+            streakData.lastDate = today;
+            localStorage.setItem('focus2026_streak', JSON.stringify(streakData));
+
+            document.getElementById('streakCount').textContent = streakData.streak;
+            document.getElementById('checkinBtn').disabled = true;
+            document.getElementById('checkinBtn').textContent = '✓ 已打卡';
+
+            // 打卡奖励提示
+            const messages = [
+                '太棒了！继续保持！',
+                '专注力+1！',
+                '你比昨天更进一步！',
+                '连续打卡就是胜利！',
+                '每一份坚持都算数！'
+            ];
+            const randomMsg = messages[Math.floor(Math.random() * messages.length)];
+            showToast(randomMsg, 'success');
+        }
+
+        // 复制分享链接
+        function copyShareLink() {
+            const url = window.location.href;
+            const shareText = `我用「2026专注」工具，把所有目标减到3件事，2026年不焦虑了！\n\n工具链接：${url}\n\n用减法思维规划你的2026，告别目标焦虑。`;
+
+            // 优先使用现代 API
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(shareText).then(() => {
+                    showCopySuccess();
+                }).catch(() => {
+                    fallbackCopy(shareText);
+                });
+            } else {
+                fallbackCopy(shareText);
+            }
+        }
+
+        // 备用复制方案
+        function fallbackCopy(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            textarea.style.position = 'fixed';
+            textarea.style.left = '-9999px';
+            textarea.style.top = '-9999px';
+            document.body.appendChild(textarea);
+            textarea.select();
+
+            try {
+                document.execCommand('copy');
+                showCopySuccess();
+            } catch (err) {
+                // 最后的保底方案：prompt
+                prompt('请手动复制以下内容：', text);
+            }
+
+            document.body.removeChild(textarea);
+        }
+
+        // 显示复制成功提示
+        function showCopySuccess() {
+            const success = document.getElementById('copySuccess');
+            success.style.display = 'inline';
+            setTimeout(() => {
+                success.style.display = 'none';
+            }, 3000);
+        }
+
+        // ===== 用户认证相关 =====
+
+        // 检查登录状态
+        async function checkAuth() {
+            if (!supabase) return;
+
+            const { data: { session } } = await supabase.auth.getSession();
+
+            if (session) {
+                currentUser = session.user;
+                isCloudMode = true;
+                updateUserUI(true);
+                await loadFromCloud();
+            } else {
+                currentUser = null;
+                isCloudMode = false;
+                updateUserUI(false);
+                loadFromStorage();
+            }
+        }
+
+        // 显示登录弹窗
+        function showLoginModal() {
+            document.getElementById('loginModal').classList.add('show');
+            showLoginForm();
+        }
+
+        // 隐藏登录弹窗
+        function hideLoginModal() {
+            document.getElementById('loginModal').classList.remove('show');
+        }
+
+        // 显示登录表单
+        function showLoginForm() {
+            document.getElementById('loginForm').style.display = 'block';
+            document.getElementById('registerForm').style.display = 'none';
+        }
+
+        // 显示注册表单
+        function showRegisterForm() {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('registerForm').style.display = 'block';
+        }
+
+        // 处理登录
+        async function handleLogin() {
+            if (!supabase) {
+                showToast('云端服务未初始化', 'error');
+                return;
+            }
+
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            const btn = document.getElementById('loginSubmitBtn');
+
+            if (!email || !password) {
+                showToast('请填写邮箱和密码', 'error');
+                return;
+            }
+
+            btn.disabled = true;
+            btn.textContent = '登录中...';
+
+            try {
+                const { data, error } = await supabase.auth.signInWithPassword({
+                    email,
+                    password
+                });
+
+                if (error) throw error;
+
+                currentUser = data.user;
+                isCloudMode = true;
+                updateUserUI(true);
+                hideLoginModal();
+                showToast('登录成功！', 'success');
+                await loadFromCloud();
+            } catch (error) {
+                showToast(error.message || '登录失败', 'error');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '登录';
+            }
+        }
+
+        // 处理注册
+        async function handleRegister() {
+            if (!supabase) {
+                showToast('云端服务未初始化', 'error');
+                return;
+            }
+
+            const email = document.getElementById('registerEmail').value.trim();
+            const password = document.getElementById('registerPassword').value;
+            const confirmPassword = document.getElementById('registerConfirmPassword').value;
+            const btn = document.getElementById('registerSubmitBtn');
+
+            if (!email || !password) {
+                showToast('请填写所有字段', 'error');
+                return;
+            }
+
+            if (password.length < 6) {
+                showToast('密码至少需要6位', 'error');
+                return;
+            }
+
+            if (password !== confirmPassword) {
+                showToast('两次密码不一致', 'error');
+                return;
+            }
+
+            btn.disabled = true;
+            btn.textContent = '注册中...';
+
+            try {
+                const { data, error } = await supabase.auth.signUp({
+                    email,
+                    password
+                });
+
+                if (error) throw error;
+
+                showToast('注册成功！请检查邮箱确认账号', 'success');
+                showLoginForm();
+            } catch (error) {
+                showToast(error.message || '注册失败', 'error');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '注册';
+            }
+        }
+
+        // 退出登录
+        async function logout() {
+            if (!confirm('确定要退出登录吗？本地数据将不会删除。')) return;
+
+            if (supabase) {
+                await supabase.auth.signOut();
+            }
+
+            currentUser = null;
+            isCloudMode = false;
+            updateUserUI(false);
+            loadFromStorage();
+            hideUserMenu();
+            showToast('已退出登录', 'success');
+        }
+
+        // 更新用户UI
+        function updateUserUI(isLoggedIn) {
+            const userAvatar = document.getElementById('userAvatar');
+            const loginBtn = document.getElementById('loginBtn');
+            const syncStatus = document.getElementById('syncStatus');
+            const syncText = document.getElementById('syncText');
+
+            if (isLoggedIn && currentUser) {
+                userAvatar.style.display = 'flex';
+                userAvatar.textContent = currentUser.email.charAt(0).toUpperCase();
+                loginBtn.style.display = 'none';
+                syncStatus.classList.add('synced');
+                syncText.textContent = '已登录';
+            } else {
+                userAvatar.style.display = 'none';
+                loginBtn.style.display = 'inline-block';
+                syncStatus.classList.remove('synced');
+                syncText.textContent = '本地模式';
+            }
+        }
+
+        // 切换用户菜单
+        function toggleUserMenu() {
+            const menu = document.getElementById('userMenu');
+            menu.classList.toggle('show');
+
+            // 点击外部关闭菜单
+            document.addEventListener('click', function closeMenu(e) {
+                if (!e.target.closest('.user-info')) {
+                    menu.classList.remove('show');
+                    document.removeEventListener('click', closeMenu);
+                }
+            });
+        }
+
+        // 隐藏用户菜单
+        function hideUserMenu() {
+            document.getElementById('userMenu').classList.remove('show');
+        }
+
+        // 查看个人资料
+        function viewProfile() {
+            hideUserMenu();
+            if (currentUser) {
+                alert(`邮箱：${currentUser.email}\n创建时间：${new Date(currentUser.created_at).toLocaleDateString()}`);
+            }
+        }
+
+        // ===== 云端同步相关 =====
+
+        // 从云端加载数据
+        async function loadFromCloud() {
+            if (!currentUser || !supabase) return;
+
+            setSyncStatus('syncing');
+
+            try {
+                const { data, error } = await supabase
+                    .from('user_focus_data')
+                    .select('*')
+                    .eq('user_id', currentUser.id)
+                    .single();
+
+                if (error && error.code !== 'PGRST116') throw error;
+
+                if (data && data.focus_data) {
+                    const savedData = JSON.parse(data.focus_data);
+                    if (savedData.step) {
+                        allGoalsList = savedData.allGoalsList || [];
+                        top5Goals = savedData.top5Goals || [];
+                        top3Goals = savedData.top3Goals || [];
+                        weights = savedData.weights || [0, 0, 0];
+
+                        // 恢复到对应步骤
+                        if (savedData.step >= 1) {
+                            goToStep(1);
+                            updateProgress(20);
+                            renderGoalCards();
+                            updateGoalCount();
+                        }
+                        if (savedData.step >= 2) {
+                            goToStep(2);
+                            updateProgress(40);
+                            renderStep2List();
+                        }
+                        if (savedData.step >= 3) {
+                            goToStep(3);
+                            updateProgress(60);
+                            renderStep3List();
+                        }
+                        if (savedData.step >= 4) {
+                            goToStep(4);
+                            updateProgress(80);
+                            renderWeightSection();
+                        }
+                        if (savedData.step >= 5) {
+                            goToStep(5);
+                            updateProgress(100);
+                            generateCard();
+                        }
+
+                        setSyncStatus('synced');
+                        showToast('数据已从云端同步', 'info');
+                    }
+                } else {
+                    loadFromStorage();
+                }
+            } catch (error) {
+                console.error('从云端加载失败:', error);
+                setSyncStatus('error');
+                loadFromStorage();
+            }
+        }
+
+        // 保存到云端
+        async function saveToCloud(step) {
+            if (!currentUser || !supabase) return;
+
+            const data = {
+                step: step,
+                allGoalsList: allGoalsList,
+                top5Goals: top5Goals,
+                top3Goals: top3Goals,
+                weights: weights
+            };
+
+            setSyncStatus('syncing');
+
+            try {
+                const { data: existing, error: fetchError } = await supabase
+                    .from('user_focus_data')
+                    .select('*')
+                    .eq('user_id', currentUser.id)
+                    .single();
+
+                if (fetchError && fetchError.code !== 'PGRST116') throw fetchError;
+
+                const now = new Date().toISOString();
+
+                if (existing) {
+                    // 更新现有记录
+                    await supabase
+                        .from('user_focus_data')
+                        .update({
+                            focus_data: JSON.stringify(data),
+                            updated_at: now
+                        })
+                        .eq('user_id', currentUser.id);
+                } else {
+                    // 创建新记录
+                    await supabase
+                        .from('user_focus_data')
+                        .insert({
+                            user_id: currentUser.id,
+                            focus_data: JSON.stringify(data),
+                            created_at: now,
+                            updated_at: now
+                        });
+                }
+
+                setSyncStatus('synced');
+            } catch (error) {
+                console.error('保存到云端失败:', error);
+                setSyncStatus('error');
+                showToast('保存失败，请检查网络', 'error');
+            }
+        }
+
+        // 手动同步到云端
+        async function syncToCloud() {
+            hideUserMenu();
+
+            if (!currentUser) {
+                showToast('请先登录', 'error');
+                showLoginModal();
+                return;
+            }
+
+            setSyncStatus('syncing');
+            showToast('正在同步...', 'info');
+
+            try {
+                // 保存到云端
+                const data = {
+                    step: getCurrentStep(),
+                    allGoalsList: allGoalsList,
+                    top5Goals: top5Goals,
+                    top3Goals: top3Goals,
+                    weights: weights
+                };
+
+                const { data: existing, error: fetchError } = await supabase
+                    .from('user_focus_data')
+                    .select('*')
+                    .eq('user_id', currentUser.id)
+                    .single();
+
+                const now = new Date().toISOString();
+
+                if (existing) {
+                    await supabase
+                        .from('user_focus_data')
+                        .update({
+                            focus_data: JSON.stringify(data),
+                            updated_at: now
+                        })
+                        .eq('user_id', currentUser.id);
+                } else {
+                    await supabase
+                        .from('user_focus_data')
+                        .insert({
+                            user_id: currentUser.id,
+                            focus_data: JSON.stringify(data),
+                            created_at: now,
+                            updated_at: now
+                        });
+                }
+
+                setSyncStatus('synced');
+                showToast('同步成功！', 'success');
+            } catch (error) {
+                console.error('同步失败:', error);
+                setSyncStatus('error');
+                showToast('同步失败，请检查网络', 'error');
+            }
+        }
+
+        // 获取当前步骤
+        function getCurrentStep() {
+            if (top3Goals.length === 3 && weights.reduce((a, b) => a + b, 0) === 100) return 5;
+            if (top3Goals.length === 3) return 4;
+            if (top5Goals.length === 5) return 3;
+            if (top5Goals.length > 0) return 2;
+            return allGoalsList.length > 0 ? 1 : 0;
+        }
+
+        // 设置同步状态
+        function setSyncStatus(status) {
+            const syncStatus = document.getElementById('syncStatus');
+            const syncText = document.getElementById('syncText');
+
+            syncStatus.classList.remove('synced', 'syncing', 'error');
+
+            switch (status) {
+                case 'synced':
+                    syncStatus.classList.add('synced');
+                    syncText.textContent = '已同步';
+                    break;
+                case 'syncing':
+                    syncStatus.classList.add('syncing');
+                    syncText.textContent = '同步中...';
+                    break;
+                case 'error':
+                    syncText.textContent = '同步失败';
+                    break;
+                default:
+                    syncText.textContent = isCloudMode ? '已登录' : '本地模式';
+            }
+        }
+
+        // 重写 saveToStorage 以支持云端同步
+        const originalSaveToStorage = saveToStorage;
+        saveToStorage = async function(step) {
+            // 保存到本地
+            originalSaveToStorage(step);
+
+            // 如果已登录，保存到云端
+            if (isCloudMode && currentUser) {
+                saveToCloud(step);
+            }
+        };
+
+        // 页面加载
+        window.onload = async function() {
+            await checkAuth();
+        };
+    </script>
+</body>
+</html>
